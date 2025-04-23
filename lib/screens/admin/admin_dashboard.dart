@@ -54,7 +54,7 @@ class _AdminDashboardState extends State<AdminDashboard>
 
   Future<void> _loadDashboardData() async {
     final result = await AdminDashboardController.fetchUserStats(widget.token);
-    final menuItems = await MenuService.getMenuWithCategory();
+    final menuItems = await MenuService.getMenuWithCategory(widget.token); // ✅ исправлено
 
     if (result != null) {
       final Map<String, int> counts = {};
@@ -291,6 +291,7 @@ class _AdminDashboardState extends State<AdminDashboard>
     );
   }
 }
+
 
 
 

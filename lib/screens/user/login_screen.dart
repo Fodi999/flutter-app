@@ -27,22 +27,21 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
 
   void _login() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
     try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
       final response = await AuthService.login(email, password);
+
       final token = response['token'];
       final userId = response['id'];
       final role = response['role'];
 
       if (role == 'admin') {
-        // "Мок" для админа, т.к. в базе может не быть всех данных
         final user = User(
           id: userId,
           name: 'Admin',
@@ -66,9 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        // Получаем актуального пользователя
         final user = await UserService.getUserById(userId, token);
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -89,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -104,77 +102,111 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Вход',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Введите email и пароль',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor.withOpacity(0.8),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Email
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-
-              // Пароль
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Пароль',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              if (_error != null)
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.red),
+                  'Вход',
                   textAlign: TextAlign.center,
-                ),
-
-              const SizedBox(height: 16),
-
-              ElevatedButton(
-                onPressed: _isLoading ? null : _login,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Войти'),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  'Введите email и пароль для авторизации',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withOpacity(0.7),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Поле Email
+                _buildGlassInput(
+                  controller: _emailController,
+                  hintText: 'Email',
+                  icon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+
+                // Поле Пароль
+                _buildGlassInput(
+                  controller: _passwordController,
+                  hintText: 'Пароль',
+                  icon: Icons.lock,
+                  obscureText: true,
+                ),
+                const SizedBox(height: 24),
+
+                if (_error != null)
+                  Text(
+                    _error!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Войти'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  /// Современный glassmorphism input
+  Widget _buildGlassInput({
+    required TextEditingController controller,
+    required String hintText,
+    IconData? icon,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+  }) {
+    final theme = Theme.of(context);
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      style: TextStyle(color: theme.colorScheme.onSurface),
+      decoration: InputDecoration(
+        prefixIcon: icon != null ? Icon(icon, color: theme.colorScheme.primary) : null,
+        hintText: hintText,
+        hintStyle: TextStyle(color: theme.hintColor),
+        filled: true,
+        fillColor: theme.colorScheme.surface.withOpacity(0.3),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
 }
+
+
 
 
 

@@ -27,12 +27,15 @@ class MenuService {
     );
   }
 
-  /// Получить блюда с привязкой к категориям
-  static Future<List<MenuItem>> getMenuWithCategory() async {
+  /// Получить блюда с привязкой к категориям (требуется токен)
+  static Future<List<MenuItem>> getMenuWithCategory(String token) async {
     final url = '$baseUrl/menu/with-category';
-    logInfo('📥 [GET MENU WITH CATEGORY] GET $url');
+    final headers = authorizedHeaders(token);
 
-    final response = await http.get(Uri.parse(url));
+    logInfo('📥 [GET MENU WITH CATEGORY] GET $url');
+    logDebug('📨 Headers: $headers');
+
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     logInfo('✅ Status: ${response.statusCode}');
     if (response.statusCode != 200) {
@@ -179,6 +182,7 @@ class MenuService {
     );
   }
 }
+
 
 
 

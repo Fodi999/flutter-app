@@ -27,7 +27,7 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
   Future<void> _fetchInventory() async {
     setState(() => isLoading = true);
     try {
-      final fetched = await InventoryService.getInventoryItems();
+      final fetched = await InventoryService.getInventoryItems(widget.token); // ✅ исправлено
       setState(() {
         items = fetched;
         _applyFilter();
@@ -45,7 +45,7 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Продукт удалён')),
       );
-      _fetchInventory(); // Обновить список после удаления
+      _fetchInventory();
     } catch (e) {
       debugPrint('Ошибка при удалении: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -258,4 +258,5 @@ class _ManageInventoryScreenState extends State<ManageInventoryScreen> {
           );
   }
 }
+
 

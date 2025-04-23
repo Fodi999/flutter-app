@@ -73,6 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text('Регистрация'),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: widget.onToggleTheme,
@@ -90,14 +91,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Регистрация',
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 300),
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
                     color: textColor,
                   ),
-                  textAlign: TextAlign.center,
+                  child: const Text(
+                    'Регистрация',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 _buildInputField(controller: _nameController, hint: 'Имя'),
@@ -133,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(
                     _error!,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                 const SizedBox(height: 10),
                 ElevatedButton(
@@ -142,13 +147,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 3,
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Зарегистрироваться'),
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Зарегистрироваться',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                 ),
                 const SizedBox(height: 20),
                 TextButton(
@@ -185,21 +198,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+    final theme = Theme.of(context);
+
+    return Container(
       decoration: BoxDecoration(
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3),
+          color: Colors.grey.withOpacity(0.2),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         style: const TextStyle(fontSize: 16),
         decoration: InputDecoration(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           hintText: hint,
           border: InputBorder.none,
         ),
@@ -207,6 +230,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
 
 
 

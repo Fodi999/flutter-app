@@ -7,11 +7,14 @@ import 'package:sushi_app/utils/log_helper.dart'; // ✅ логгер
 
 class InventoryService {
   // 📦 Получить все продукты со склада
-  static Future<List<InventoryItem>> getInventoryItems() async {
+  static Future<List<InventoryItem>> getInventoryItems(String token) async {
     final url = '$baseUrl/menu/inventory';
-    logInfo('📥 [GET INVENTORY] GET $url');
+    final headers = authorizedHeaders(token); // ✅ добавлен заголовок
 
-    final response = await http.get(Uri.parse(url));
+    logInfo('📥 [GET INVENTORY] GET $url');
+    logDebug('📨 Headers: $headers');
+
+    final response = await http.get(Uri.parse(url), headers: headers);
 
     logInfo('✅ Status: ${response.statusCode}');
     logDebug('📦 Response: ${utf8.decode(response.bodyBytes)}');
@@ -97,6 +100,7 @@ class InventoryService {
     );
   }
 }
+
 
 
 

@@ -54,11 +54,12 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
   }
 
   void _loadMenuItems() {
-    _menuFuture = MenuService.getMenuWithCategory();
+    _menuFuture = MenuService.getMenuWithCategory(widget.token); // 🛠 исправлено
   }
 
   Future<void> _loadInventory() async {
-    final inv = await InventoryService.getInventoryItems();
+  final inv = await InventoryService.getInventoryItems(widget.token);
+
     setState(() => inventory = inv);
   }
 
@@ -272,6 +273,7 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
     );
   }
 }
+
 
 
 

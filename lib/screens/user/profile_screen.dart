@@ -19,14 +19,13 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
   late Future<User> _userFuture;
-  late Future<List<MenuItem>> _publishedFuture;
+  late Future<List<MenuItem>> _menuFuture;
+  late TabController _tabController;
 
   bool editMode = false;
   bool isDark = false;
-  late TabController _tabController;
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -37,222 +36,184 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   final lightTheme = ThemeData(
     brightness: Brightness.light,
-    primarySwatch: Colors.green,
-    scaffoldBackgroundColor: const Color(0xFFF2FFE5),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFDFFFD6),
-      foregroundColor: Colors.black87,
-    ),
+    scaffoldBackgroundColor: const Color(0xFFF7FAF7),
+    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
+    cardColor: Colors.white.withOpacity(0.7),
   );
 
   final darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primarySwatch: Colors.green,
-    scaffoldBackgroundColor: const Color(0xFF003300),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF002200),
-      foregroundColor: Colors.white,
-    ),
+    scaffoldBackgroundColor: const Color(0xFF121212),
+    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50), brightness: Brightness.dark),
+    cardColor: Colors.grey[900]!.withOpacity(0.6),
   );
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _reloadAll();
+    _loadUser();
+    _menuFuture = MenuService.getMenuWithCategory(widget.token);
   }
 
-  void _reloadAll() {
-    _userFuture = _loadUser();
-    _publishedFuture = MenuService.getMenuWithCategory(); // ← берём с категориями
+  void _loadUser() {
+    _userFuture = UserService.getUserById(widget.userId, widget.token).then((user) {
+      nameController.text = user.name;
+      emailController.text = user.email;
+      phoneController.text = user.phone;
+      addressController.text = user.address ?? '';
+      bioController.text = user.bio ?? '';
+      birthdayController.text = user.birthday ?? '';
+      return user;
+    });
   }
 
-  Future<User> _loadUser() async {
-    final user = await UserService.getUserById(widget.userId, widget.token);
-    nameController.text = user.name;
-    emailController.text = user.email;
-    phoneController.text = user.phone;
-    addressController.text = user.address ?? '';
-    bioController.text = user.bio ?? '';
-    birthdayController.text = user.birthday ?? '';
-    return user;
+  Future<void> _saveProfile() async {
+    final data = {
+      "name": nameController.text,
+      "email": emailController.text,
+      "phone": phoneController.text,
+      "address": addressController.text,
+      "bio": bioController.text,
+      "birthday": birthdayController.text,
+    };
+    await UserService.updateUserById(widget.userId, data, widget.token);
+    setState(() {
+      editMode = false;
+      _loadUser();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Профиль обновлён')));
   }
 
-  Widget _buildTextRow(String title, String? value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            Text('$title: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Expanded(child: Text(value?.isNotEmpty == true ? value! : '—')),
-          ],
+  Widget _buildHeader(User user) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: isDark ? [Colors.green.shade900, Colors.black] : [Colors.lightGreenAccent, Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      );
-
-  Widget _buildHeader(User user) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [Colors.green.shade900, Colors.black]
-                : [Colors.lightGreenAccent, Colors.white],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 36,
-              backgroundColor: Colors.white,
-              child: Text(user.avatarLetter, style: const TextStyle(fontSize: 28)),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(user.name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text(user.email, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text('Роль: ${user.role}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-
-  /// Сетка блюд по категориям
-Widget _buildGroupedMenu(List<MenuItem> items) {
-  final Map<String, List<MenuItem>> grouped = {};
-  for (var item in items) {
-    final category = item.categoryName ?? 'Без категории';
-    grouped.putIfAbsent(category, () => []).add(item);
-  }
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: grouped.entries.map((entry) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      child: Row(
         children: [
-          const SizedBox(height: 24),
-          Text(
-            entry.key,
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: Colors.white,
+            child: Text(
+              user.avatarLetter,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 12),
-          LayoutBuilder(builder: (context, constraints) {
-            int crossAxisCount = 1;
-            if (constraints.maxWidth > 1000) {
-              crossAxisCount = 3;
-            } else if (constraints.maxWidth > 600) {
-              crossAxisCount = 2;
-            }
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: entry.value.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.78,
-              ),
-              itemBuilder: (_, i) {
-                final item = entry.value[i];
-                return UserMenuCard(
-                  item: item,
-                  onAddToCart: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Добавлено в корзину: ${item.name}')),
-                    );
-                  },
-                );
-              },
-            );
-          }),
-        ],
-      );
-    }).toList(),
-  );
-}
-
-
-  Widget _buildEditableForm() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: Column(
-        key: ValueKey(editMode),
-        children: [
-          TabBar(
-            controller: _tabController,
-            tabs: const [Tab(text: 'Профиль'), Tab(text: 'Контакты')],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 300,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                Column(
-                  children: [
-                    TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Имя')),
-                    TextField(controller: bioController, decoration: const InputDecoration(labelText: 'О себе')),
-                    TextField(controller: birthdayController, decoration: const InputDecoration(labelText: 'Дата рождения (YYYY-MM-DD)')),
-                  ],
-                ),
-                Column(
-                  children: [
-                    TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
-                    TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Телефон')),
-                    TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Адрес')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ElevatedButton(onPressed: _saveProfile, child: const Text('Сохранить')),
-              const SizedBox(width: 12),
-              OutlinedButton(onPressed: () => setState(() => editMode = false), child: const Text('Отмена')),
+              Text(user.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(user.email),
+              Text('Роль: ${user.role}', style: TextStyle(color: Colors.grey[600])),
             ],
-          ),
+          )
         ],
       ),
     );
   }
 
-  Future<void> _saveProfile() async {
-    try {
-      final data = {
-        "name": nameController.text.trim(),
-        "email": emailController.text.trim(),
-        "phone": phoneController.text.trim(),
-        "address": addressController.text.trim(),
-        "bio": bioController.text.trim(),
-        "birthday": birthdayController.text.trim(),
-      };
-      await UserService.updateUserById(widget.userId, data, widget.token);
+  Widget _buildEditableTabs() {
+    return Column(
+      children: [
+        TabBar(
+          controller: _tabController,
+          labelColor: Theme.of(context).colorScheme.primary,
+          tabs: const [Tab(text: 'Профиль'), Tab(text: 'Контакты')],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 300,
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              Column(
+                children: [
+                  TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Имя')),
+                  TextField(controller: bioController, decoration: const InputDecoration(labelText: 'О себе')),
+                  TextField(controller: birthdayController, decoration: const InputDecoration(labelText: 'Дата рождения')),
+                ],
+              ),
+              Column(
+                children: [
+                  TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
+                  TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Телефон')),
+                  TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Адрес')),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            ElevatedButton(onPressed: _saveProfile, child: const Text('Сохранить')),
+            const SizedBox(width: 12),
+            OutlinedButton(onPressed: () => setState(() => editMode = false), child: const Text('Отмена')),
+          ],
+        )
+      ],
+    );
+  }
 
-      setState(() {
-        editMode = false;
-        _reloadAll();
-      });
+  Widget _buildTextRow(String title, String? value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Text('$title: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value?.isNotEmpty == true ? value! : '—')),
+        ],
+      ),
+    );
+  }
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Профиль обновлён')));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+  Widget _buildGroupedMenu(List<MenuItem> items) {
+    final Map<String, List<MenuItem>> grouped = {};
+    for (var item in items) {
+      final cat = item.categoryName ?? 'Без категории';
+      grouped.putIfAbsent(cat, () => []).add(item);
     }
+
+    return Column(
+      children: grouped.entries.map((entry) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Text(entry.key, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 12),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: entry.value.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.8,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemBuilder: (_, i) {
+                final item = entry.value[i];
+                return UserMenuCard(
+                  item: item,
+                  onAddToCart: () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Добавлено: ${item.name}')),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -271,10 +232,10 @@ Widget _buildGroupedMenu(List<MenuItem> items) {
             ),
             IconButton(
               onPressed: () => setState(() => isDark = !isDark),
-              icon: Icon(isDark ? Icons.wb_sunny : Icons.nightlight_round),
+              icon: Icon(isDark ? Icons.wb_sunny : Icons.nightlight),
             ),
             IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.logout),
             ),
           ],
@@ -282,65 +243,40 @@ Widget _buildGroupedMenu(List<MenuItem> items) {
         body: FutureBuilder<User>(
           future: _userFuture,
           builder: (context, snapUser) {
-            if (snapUser.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapUser.hasError || !snapUser.hasData) {
-              return const Center(child: Text('Ошибка загрузки профиля'));
-            }
+            if (!snapUser.hasData) return const Center(child: CircularProgressIndicator());
             final user = snapUser.data!;
-
             return FutureBuilder<List<MenuItem>>(
-              future: _publishedFuture,
+              future: _menuFuture,
               builder: (context, snapMenu) {
-                final menuReady = snapMenu.connectionState == ConnectionState.done &&
-                    !snapMenu.hasError &&
-                    snapMenu.hasData;
-                final items = menuReady ? snapMenu.data! : const <MenuItem>[];
-
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: SingleChildScrollView(
-                    key: ValueKey(user.id + (editMode ? '_edit' : '_view')),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        _buildHeader(user),
-                        const SizedBox(height: 24),
-                        Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: editMode
-                                ? _buildEditableForm()
-                                : Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildTextRow('Телефон', user.phone),
-                                      _buildTextRow('Адрес', user.address),
-                                      _buildTextRow('О себе', user.bio),
-                                      _buildTextRow('Дата рождения', user.birthday),
-                                      _buildTextRow('ID', user.id),
-                                    ],
-                                  ),
-                          ),
+                final menu = snapMenu.data ?? [];
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      _buildHeader(user),
+                      const SizedBox(height: 20),
+                      Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                        color: theme.cardColor,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: editMode
+                              ? _buildEditableTabs()
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildTextRow('Email', user.email),
+                                    _buildTextRow('Телефон', user.phone),
+                                    _buildTextRow('Адрес', user.address),
+                                    _buildTextRow('О себе', user.bio),
+                                    _buildTextRow('День рождения', user.birthday),
+                                  ],
+                                ),
                         ),
-                        if (!editMode && menuReady) ...[
-                          const SizedBox(height: 24),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Опубликованные блюда',
-                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ),
-                          _buildGroupedMenu(items),
-                        ],
-                      ],
-                    ),
+                      ),
+                      if (!editMode) _buildGroupedMenu(menu),
+                    ],
                   ),
                 );
               },
@@ -351,6 +287,7 @@ Widget _buildGroupedMenu(List<MenuItem> items) {
     );
   }
 }
+
 
 
 
