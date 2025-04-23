@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:animations/animations.dart'; // FadeThroughPageTransitionsBuilder
+import 'package:animations/animations.dart';
 import 'providers/theme_provider.dart';
 import 'screens/user/welcome_screen.dart';
 
@@ -49,7 +49,7 @@ class SushiApp extends StatelessWidget {
                   color: Color(0xFF616161),
                 ),
               ),
-              cardTheme: CardTheme(
+              cardTheme: CardThemeData(
                 elevation: 0,
                 color: Colors.white.withOpacity(0.7),
                 shape: RoundedRectangleBorder(
@@ -142,7 +142,7 @@ class SushiApp extends StatelessWidget {
                   color: Color(0xFFBDBDBD),
                 ),
               ),
-              cardTheme: CardTheme(
+              cardTheme: CardThemeData(
                 elevation: 0,
                 color: Colors.grey[900]!.withOpacity(0.7),
                 shape: RoundedRectangleBorder(
@@ -217,6 +217,7 @@ class SushiApp extends StatelessWidget {
     );
   }
 }
+
 
 
 
