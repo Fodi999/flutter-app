@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sushi_app/theme/app_spacing.dart';
+import 'package:sushi_app/theme/theme_typography.dart';
+import 'package:sushi_app/utils/responsive.dart'; // ✅ Добавлено
 import 'register_screen.dart';
-import 'login_screen.dart'; // подключаем LoginScreen
+import 'login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -25,7 +28,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -67,6 +69,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
 
+    final isDesktop = Responsive.isDesktop(context);
+    final maxWidth = isDesktop ? 600.0 : double.infinity;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -85,119 +90,126 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'SushiRobot',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.xl,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedTypography(
+                    text: 'SushiRobot',
+                    style: theme.textTheme.displayLarge!,
+                    animate: true,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Доставка суши к вашей двери\nЗакажите свежие суши прямо сейчас!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: textColor.withOpacity(0.85),
-                  ),
-                ),
-                const SizedBox(height: 36),
-
-                // Анимационные блоки
-                for (int i = 0; i < 3; i++) ...[
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return Opacity(
-                        opacity: _fadeAnimations[i].value,
-                        child: Transform.translate(
-                          offset: _slideAnimations[i].value * 20,
-                          child: _buildFeatureBox(
-                            context,
-                            i == 0
-                                ? Icons.check_circle
-                                : i == 1
-                                    ? Icons.local_shipping
-                                    : Icons.verified_user,
-                            i == 0
-                                ? 'Свежие ингредиенты'
-                                : i == 1
-                                    ? 'Быстрое оформление заказа'
-                                    : 'Качество и безопасность',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                const SizedBox(height: 24),
-
-                // Кнопки
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => LoginScreen(
-                                isDarkMode: widget.isDarkMode,
-                                onToggleTheme: widget.onToggleTheme,
-                              ),
-                            ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(
-                            color: theme.colorScheme.primary.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Text(
-                          'Вход',
-                          style: TextStyle(color: textColor),
-                        ),
-                      ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Доставка суши к вашей двери\nЗакажите свежие суши прямо сейчас!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: textColor.withOpacity(0.85),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => RegisterScreen(
-                                isDarkMode: widget.isDarkMode,
-                                onToggleTheme: widget.onToggleTheme,
-                              ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Анимационные блоки
+                  for (int i = 0; i < 3; i++) ...[
+                    AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _fadeAnimations[i].value,
+                          child: Transform.translate(
+                            offset: _slideAnimations[i].value * 20,
+                            child: _buildFeatureBox(
+                              context,
+                              i == 0
+                                  ? Icons.check_circle
+                                  : i == 1
+                                      ? Icons.local_shipping
+                                      : Icons.verified_user,
+                              i == 0
+                                  ? 'Свежие ингредиенты'
+                                  : i == 1
+                                      ? 'Быстрое оформление заказа'
+                                      : 'Качество и безопасность',
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text('Регистрация'),
-                      ),
+                        );
+                      },
                     ),
+                    const SizedBox(height: AppSpacing.md),
                   ],
-                ),
-              ],
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Кнопки
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => LoginScreen(
+                                  isDarkMode: widget.isDarkMode,
+                                  onToggleTheme: widget.onToggleTheme,
+                                ),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                            side: BorderSide(
+                              color: theme.colorScheme.primary.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Text(
+                            'Вход',
+                            style: TextStyle(color: textColor),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => RegisterScreen(
+                                  isDarkMode: widget.isDarkMode,
+                                  onToggleTheme: widget.onToggleTheme,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                            ),
+                          ),
+                          child: const Text('Регистрация'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -218,14 +230,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           width: 1.2,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: [
           CircleAvatar(
             backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
             child: Icon(icon, color: theme.colorScheme.primary),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               text,
@@ -240,6 +255,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
+
 
 
 

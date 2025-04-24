@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user.dart';
 import '../../models/menu_item.dart';
-import '../../providers/theme_provider.dart';
+import '../../theme/theme_provider.dart';
 import '../../services/user_service.dart';
 import '../../services/menu_service.dart';
 import 'controllers/admin_dashboard_controller.dart';

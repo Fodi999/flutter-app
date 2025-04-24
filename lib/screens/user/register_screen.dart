@@ -3,6 +3,7 @@ import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
+import '../../theme/app_sizes.dart';
 
 class RegisterScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -87,7 +88,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingXL,
+              vertical: AppSizes.paddingL,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -104,27 +108,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSizes.spacingXL),
                 _buildInputField(controller: _nameController, hint: 'Имя'),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSizes.spacingM),
                 _buildInputField(
                   controller: _emailController,
                   hint: 'Email',
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSizes.spacingM),
                 _buildInputField(
                   controller: _phoneController,
                   hint: 'Телефон',
                   keyboardType: TextInputType.phone,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSizes.spacingM),
                 _buildInputField(
                   controller: _passwordController,
                   hint: 'Пароль',
                   obscureText: true,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSizes.spacingS),
                 Text(
                   'Пароль должен быть не меньше 8 символов,\nсодержать цифру и заглавную букву',
                   textAlign: TextAlign.center,
@@ -133,23 +137,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: textColor.withOpacity(0.6),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.spacingL),
                 if (_error != null)
                   Text(
                     _error!,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.redAccent),
                   ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSizes.spacingS),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusL),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSizes.padding,
+                    ),
                     elevation: 3,
                   ),
                   child: _isLoading
@@ -163,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.spacingL),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -203,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSizes.radius),
         border: Border.all(
           color: Colors.grey.withOpacity(0.2),
         ),
@@ -221,8 +227,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         keyboardType: keyboardType,
         style: const TextStyle(fontSize: 16),
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.padding,
+            vertical: AppSizes.padding,
+          ),
           hintText: hint,
           border: InputBorder.none,
         ),
@@ -230,6 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
 
 
 

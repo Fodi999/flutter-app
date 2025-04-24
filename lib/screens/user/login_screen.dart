@@ -5,6 +5,10 @@ import '../../models/user.dart';
 import '../admin/admin_dashboard.dart';
 import 'profile_screen.dart';
 
+import '../../theme/app_colors.dart';
+import '../../theme/app_sizes.dart';
+import '../../theme/text_styles.dart';
+
 class LoginScreen extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onToggleTheme;
@@ -83,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -104,64 +107,60 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.padding * 1.5,
+              vertical: AppSizes.padding,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   'Вход',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+                  style: AppTextStyles.displayLarge,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSizes.spacingXS),
                 Text(
                   'Введите email и пароль для авторизации',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor.withOpacity(0.7),
-                  ),
+                  style: AppTextStyles.bodyMedium,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSizes.spacingXL),
 
-                // Поле Email
                 _buildGlassInput(
                   controller: _emailController,
                   hintText: 'Email',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSizes.spacingM),
 
-                // Поле Пароль
                 _buildGlassInput(
                   controller: _passwordController,
                   hintText: 'Пароль',
                   icon: Icons.lock,
                   obscureText: true,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSizes.spacingL),
 
                 if (_error != null)
                   Text(
                     _error!,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: AppColors.error),
                   ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSizes.spacingM),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSizes.padding,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusXL),
                     ),
                   ),
                   child: _isLoading
@@ -176,7 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// Современный glassmorphism input
   Widget _buildGlassInput({
     required TextEditingController controller,
     required String hintText,
@@ -189,22 +187,28 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      style: TextStyle(color: theme.colorScheme.onSurface),
+      style: AppTextStyles.bodyLarge.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
-        prefixIcon: icon != null ? Icon(icon, color: theme.colorScheme.primary) : null,
+        prefixIcon: icon != null
+            ? Icon(icon, color: theme.colorScheme.primary)
+            : null,
         hintText: hintText,
-        hintStyle: TextStyle(color: theme.hintColor),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: theme.hintColor),
         filled: true,
         fillColor: theme.colorScheme.surface.withOpacity(0.3),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.padding,
+          vertical: AppSizes.padding,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radius),
           borderSide: BorderSide.none,
         ),
       ),
     );
   }
 }
+
 
 
 
