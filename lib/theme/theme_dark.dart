@@ -3,7 +3,7 @@ import 'package:animations/animations.dart';
 
 import 'app_colors.dart';
 import 'app_sizes.dart';
-import 'app_spacing.dart'; // ✅ Добавлено
+import 'app_spacing.dart';
 import 'text_styles.dart';
 
 final ThemeData darkTheme = ThemeData(
@@ -22,7 +22,7 @@ final ThemeData darkTheme = ThemeData(
     bodyMedium: AppTextStyles.bodyMedium,
     labelSmall: AppTextStyles.labelSmall,
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData( // ✅ исправлено
     elevation: 0,
     color: AppColors.glassDark,
     shape: RoundedRectangleBorder(
@@ -84,5 +84,6 @@ final ThemeData darkTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
 
 
