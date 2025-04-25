@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sushi_app/screens/user/welcome_screen.dart';
+import 'package:sushi_app/components/app_title.dart'; // ✅ добавлен
+import 'package:sushi_app/components/primary_button.dart'; // ✅ добавлен
 
 class SplashScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -40,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // 🧼 Обязательно отменяем таймер!
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -69,16 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               const Icon(Icons.ramen_dining_rounded, size: 80, color: Colors.white),
               const SizedBox(height: 32),
-              Text(
-                'SushiRobot',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 42,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
-                ),
-              ),
+              const AppTitle(fontSize: 42, animate: true),
               const SizedBox(height: 12),
               Text(
                 'Добро пожаловать на платформу\nвкусной и полезной кухни',
@@ -89,6 +82,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 1.4,
                 ),
               ),
+              const SizedBox(height: 24),
+              PrimaryButton(
+                text: 'Загрузка...',
+                onPressed: () {}, // ✅ заменено на пустую функцию
+                fullWidth: false,
+              ),
             ],
           ),
         ),
@@ -96,6 +95,8 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+
+
 
 
 

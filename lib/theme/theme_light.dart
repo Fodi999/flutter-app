@@ -1,28 +1,34 @@
+// theme_light.dart
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 
 import 'app_colors.dart';
 import 'app_sizes.dart';
-import 'app_spacing.dart'; // ✅ для отступов
+import 'app_spacing.dart';
 import 'text_styles.dart';
+
+final colorScheme = ColorScheme.fromSeed(
+  seedColor: AppColors.primary,
+  primary: AppColors.primary,
+  secondary: AppColors.secondary,
+  surface: AppColors.surfaceLight.withOpacity(0.9),
+  brightness: Brightness.light,
+);
 
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   scaffoldBackgroundColor: AppColors.backgroundLight,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: AppColors.primary,
-    primary: AppColors.primary,
-    secondary: AppColors.secondary,
-    surface: AppColors.surfaceLight.withOpacity(0.9),
-    brightness: Brightness.light,
-  ),
+  colorScheme: colorScheme,
   textTheme: const TextTheme(
     displayLarge: AppTextStyles.displayLarge,
     bodyLarge: AppTextStyles.bodyLarge,
     bodyMedium: AppTextStyles.bodyMedium,
     labelSmall: AppTextStyles.labelSmall,
+  ).apply(
+    bodyColor: Colors.black,
+    displayColor: Colors.black,
   ),
-  cardTheme: CardThemeData( // ✅ исправлено
+  cardTheme: CardThemeData(
     elevation: 0,
     color: AppColors.glassLight,
     shape: RoundedRectangleBorder(
@@ -33,8 +39,8 @@ final ThemeData lightTheme = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: AppColors.primary,
+      foregroundColor: colorScheme.onPrimary, // ✅ исправлено
+      backgroundColor: colorScheme.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusXS),
       ),
@@ -59,9 +65,7 @@ final ThemeData lightTheme = ThemeData(
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: BorderSide(
-        color: Colors.grey.withOpacity(0.2),
-      ),
+      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSizes.radius),
@@ -86,6 +90,7 @@ final ThemeData lightTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
 
 
 

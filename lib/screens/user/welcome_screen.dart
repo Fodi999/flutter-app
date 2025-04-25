@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sushi_app/components/primary_button.dart';
+import 'package:sushi_app/components/app_title.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/theme/theme_typography.dart';
-import 'package:sushi_app/utils/responsive.dart'; // ✅ Добавлено
+import 'package:sushi_app/utils/responsive.dart';
 import 'register_screen.dart';
 import 'login_screen.dart';
 
@@ -68,7 +70,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
-
     final isDesktop = Responsive.isDesktop(context);
     final maxWidth = isDesktop ? 600.0 : double.infinity;
 
@@ -99,11 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AnimatedTypography(
-                    text: 'SushiRobot',
-                    style: theme.textTheme.displayLarge!,
-                    animate: true,
-                  ),
+                  const AppTitle(fontSize: 48, animate: true),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Доставка суши к вашей двери\nЗакажите свежие суши прямо сейчас!',
@@ -115,7 +112,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Анимационные блоки
                   for (int i = 0; i < 3; i++) ...[
                     AnimatedBuilder(
                       animation: _controller,
@@ -146,11 +142,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Кнопки
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton(
+                        child: PrimaryButton(
+                          text: 'Вход',
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -162,26 +158,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               ),
                             );
                           },
-                          style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.md,
-                            ),
-                            side: BorderSide(
-                              color: theme.colorScheme.primary.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Text(
-                            'Вход',
-                            style: TextStyle(color: textColor),
-                          ),
+                          color: theme.colorScheme.surface.withOpacity(0.05),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: ElevatedButton(
+                        child: PrimaryButton(
+                          text: 'Регистрация',
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -193,17 +176,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               ),
                             );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.md,
-                            ),
-                          ),
-                          child: const Text('Регистрация'),
                         ),
                       ),
                     ],
@@ -255,6 +227,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
 
 
 

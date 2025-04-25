@@ -4,6 +4,8 @@ import '../../services/user_service.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 import '../../theme/app_sizes.dart';
+import '../../components/custom_input.dart'; // ✅ подключён кастомный инпут
+import '../../components/primary_button.dart'; // ✅ подключена кнопка
 
 class RegisterScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -104,31 +106,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: textColor,
                   ),
                   child: const Text(
-                    'Регистрация',
+                    '',
                     textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(height: AppSizes.spacingXL),
-                _buildInputField(controller: _nameController, hint: 'Имя'),
+
+                CustomInput(
+                  controller: _nameController,
+                  label: 'Имя',
+                  hintText: 'Введите имя',
+                ),
                 const SizedBox(height: AppSizes.spacingM),
-                _buildInputField(
+
+                CustomInput(
                   controller: _emailController,
-                  hint: 'Email',
+                  label: 'Email',
+                  hintText: 'example@mail.com',
                   keyboardType: TextInputType.emailAddress,
+                  prefixIcon: const Icon(Icons.email),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
-                _buildInputField(
+
+                CustomInput(
                   controller: _phoneController,
-                  hint: 'Телефон',
+                  label: 'Телефон',
+                  hintText: '+7...',
                   keyboardType: TextInputType.phone,
+                  prefixIcon: const Icon(Icons.phone),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
-                _buildInputField(
+
+                CustomInput(
                   controller: _passwordController,
-                  hint: 'Пароль',
+                  label: 'Пароль',
+                  hintText: 'Придумайте пароль',
                   obscureText: true,
+                  prefixIcon: const Icon(Icons.lock),
                 ),
                 const SizedBox(height: AppSizes.spacingS),
+
                 Text(
                   'Пароль должен быть не меньше 8 символов,\nсодержать цифру и заглавную букву',
                   textAlign: TextAlign.center,
@@ -138,6 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSizes.spacingL),
+
                 if (_error != null)
                   Text(
                     _error!,
@@ -145,30 +163,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: const TextStyle(color: Colors.redAccent),
                   ),
                 const SizedBox(height: AppSizes.spacingS),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusL),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSizes.padding,
-                    ),
-                    elevation: 3,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(
-                          'Зарегистрироваться',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+
+                PrimaryButton(
+                  text: 'Зарегистрироваться',
+                  onPressed: _isLoading ? () {} : _register,
+                  fullWidth: true,
                 ),
+
                 const SizedBox(height: AppSizes.spacingL),
                 TextButton(
                   onPressed: () {
@@ -197,47 +198,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String hint,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(AppSizes.radius),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.2),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        style: const TextStyle(fontSize: 16),
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.padding,
-            vertical: AppSizes.padding,
-          ),
-          hintText: hint,
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
 }
+
 
 
 

@@ -8,6 +8,8 @@ import 'profile_screen.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_sizes.dart';
 import '../../theme/text_styles.dart';
+import '../../components/custom_input.dart'; // ✅ добавлен импорт кастомного инпута
+import '../../components/primary_button.dart'; // ✅ добавлен импорт кастомной кнопки
 
 class LoginScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -127,18 +129,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSizes.spacingXL),
 
-                _buildGlassInput(
+                CustomInput(
                   controller: _emailController,
-                  hintText: 'Email',
-                  icon: Icons.email,
+                  label: 'Email',
+                  hintText: 'example@mail.com',
+                  prefixIcon: const Icon(Icons.email),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: AppSizes.spacingM),
 
-                _buildGlassInput(
+                CustomInput(
                   controller: _passwordController,
-                  hintText: 'Пароль',
-                  icon: Icons.lock,
+                  label: 'Пароль',
+                  hintText: 'Введите пароль',
+                  prefixIcon: const Icon(Icons.lock),
                   obscureText: true,
                 ),
                 const SizedBox(height: AppSizes.spacingL),
@@ -151,21 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                 const SizedBox(height: AppSizes.spacingM),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSizes.padding,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusXL),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Войти'),
+                PrimaryButton(
+                  text: 'Войти',
+                  onPressed: _isLoading ? () {} : _login,
                 ),
               ],
             ),
@@ -174,40 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-  Widget _buildGlassInput({
-    required TextEditingController controller,
-    required String hintText,
-    IconData? icon,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-  }) {
-    final theme = Theme.of(context);
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      style: AppTextStyles.bodyLarge.copyWith(color: theme.colorScheme.onSurface),
-      decoration: InputDecoration(
-        prefixIcon: icon != null
-            ? Icon(icon, color: theme.colorScheme.primary)
-            : null,
-        hintText: hintText,
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: theme.hintColor),
-        filled: true,
-        fillColor: theme.colorScheme.surface.withOpacity(0.3),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.padding,
-          vertical: AppSizes.padding,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radius),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
 }
+
 
 
 

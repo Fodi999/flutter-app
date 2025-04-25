@@ -4,6 +4,7 @@ import '../../models/menu_item.dart';
 import '../../services/user_service.dart';
 import '../../services/menu_service.dart';
 import 'components/user_menu_card.dart';
+import '../../components/custom_card.dart'; // ✅ добавлен
 
 class ProfileScreen extends StatefulWidget {
   final String userId;
@@ -255,25 +256,20 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                     children: [
                       _buildHeader(user),
                       const SizedBox(height: 20),
-                      Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 0,
-                        color: theme.cardColor,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: editMode
-                              ? _buildEditableTabs()
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildTextRow('Email', user.email),
-                                    _buildTextRow('Телефон', user.phone),
-                                    _buildTextRow('Адрес', user.address),
-                                    _buildTextRow('О себе', user.bio),
-                                    _buildTextRow('День рождения', user.birthday),
-                                  ],
-                                ),
-                        ),
+                      CustomCard(
+                        padding: const EdgeInsets.all(16),
+                        child: editMode
+                            ? _buildEditableTabs()
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildTextRow('Email', user.email),
+                                  _buildTextRow('Телефон', user.phone),
+                                  _buildTextRow('Адрес', user.address),
+                                  _buildTextRow('О себе', user.bio),
+                                  _buildTextRow('День рождения', user.birthday),
+                                ],
+                              ),
                       ),
                       if (!editMode) _buildGroupedMenu(menu),
                     ],
@@ -287,6 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     );
   }
 }
+
 
 
 

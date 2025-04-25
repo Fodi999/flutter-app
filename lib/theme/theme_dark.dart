@@ -1,3 +1,4 @@
+// theme_dark.dart
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 
@@ -21,8 +22,11 @@ final ThemeData darkTheme = ThemeData(
     bodyLarge: AppTextStyles.bodyLarge,
     bodyMedium: AppTextStyles.bodyMedium,
     labelSmall: AppTextStyles.labelSmall,
+  ).apply(
+    bodyColor: Colors.white,
+    displayColor: Colors.white,
   ),
-  cardTheme: CardThemeData( // ✅ исправлено
+  cardTheme: CardThemeData(
     elevation: 0,
     color: AppColors.glassDark,
     shape: RoundedRectangleBorder(
@@ -33,7 +37,7 @@ final ThemeData darkTheme = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.black,
+      foregroundColor: const ColorScheme.dark().onPrimary, // ✅ автоматически подстраивается
       backgroundColor: AppColors.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusXS),
@@ -84,6 +88,8 @@ final ThemeData darkTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
+
 
 
 
