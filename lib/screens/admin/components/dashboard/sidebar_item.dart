@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SidebarItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final bool showLabel;
-  final VoidCallback onTap;
-
+  // 1️⃣ Конструктор сразу после объявления класса
   const SidebarItem({
     super.key,
     required this.icon,
@@ -15,6 +10,13 @@ class SidebarItem extends StatelessWidget {
     this.showLabel = true,
     required this.onTap,
   });
+
+  // 2️⃣ Затем — поля
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final bool showLabel;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,8 @@ class SidebarItem extends StatelessWidget {
                       label,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            selected ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -55,5 +58,6 @@ class SidebarItem extends StatelessWidget {
     );
   }
 }
+
 
 

@@ -1,7 +1,6 @@
-// theme_dark.dart
-import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+// lib/theme/theme_dark.dart
 
+import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_sizes.dart';
 import 'app_spacing.dart';
@@ -9,85 +8,66 @@ import 'text_styles.dart';
 
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
+  // фон всего скрина
   scaffoldBackgroundColor: AppColors.backgroundDark,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: AppColors.primary,
+  // используем const-конструктор и убираем deprecated background/onBackground
+  colorScheme: const ColorScheme.dark(
     primary: AppColors.primary,
     secondary: AppColors.secondary,
-    surface: AppColors.surfaceDark.withOpacity(0.8),
-    brightness: Brightness.dark,
+    surface: AppColors.surfaceDark,
+    onPrimary: Colors.black,
+    onSecondary: Colors.black,
+    onSurface: Colors.white70,
+    error: AppColors.error,
+    onError: Colors.black,
   ),
   textTheme: const TextTheme(
     displayLarge: AppTextStyles.displayLarge,
+    headlineLarge: AppTextStyles.headlineLarge,
     bodyLarge: AppTextStyles.bodyLarge,
     bodyMedium: AppTextStyles.bodyMedium,
     labelSmall: AppTextStyles.labelSmall,
   ).apply(
-    bodyColor: Colors.white,
-    displayColor: Colors.white,
+    bodyColor: AppColors.textPrimaryDark,
+    displayColor: AppColors.textPrimaryDark,
   ),
-  cardTheme: CardThemeData(
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.transparent,
     elevation: 0,
-    color: AppColors.glassDark,
+    iconTheme: IconThemeData(color: Colors.white),
+    titleTextStyle: TextStyle(
+      fontFamily: 'YourFontFamily', // если нужно, или замените на AppTextStyles.displayLarge.copyWith(...)
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: AppColors.primary,
+    ),
+  ),
+  cardTheme: CardTheme(
+    color: AppColors.surfaceDark,
+    elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSizes.radius),
     ),
-    surfaceTintColor: Colors.transparent,
-    clipBehavior: Clip.antiAlias,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      foregroundColor: const ColorScheme.dark().onPrimary, // ✅ автоматически подстраивается
       backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusXS),
       ),
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.sm,
-        horizontal: AppSpacing.md,
-      ),
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.3),
     ),
-  ),
-  inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.surfaceDark.withOpacity(0.5),
-    hintStyle: TextStyle(
-      color: Colors.grey[400],
-      fontFamily: AppTextStyles.bodyMedium.fontFamily,
-    ),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: BorderSide.none,
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: const BorderSide(
-        color: AppColors.primary,
-        width: 2,
-      ),
-    ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.md,
-      vertical: AppSpacing.sm,
-    ),
-  ),
-  pageTransitionsTheme: const PageTransitionsTheme(
-    builders: {
-      TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.windows: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.linux: FadeThroughPageTransitionsBuilder(),
-    },
   ),
   useMaterial3: true,
 );
+
+
+
+
 
 
 

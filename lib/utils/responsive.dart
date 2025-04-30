@@ -1,4 +1,8 @@
+// lib/utils/responsive.dart
+
 import 'package:flutter/material.dart';
+
+/// Утилита для определения типа устройства и размеров экрана
 
 class Responsive {
   static bool isMobile(BuildContext context) =>
@@ -16,4 +20,8 @@ class Responsive {
 
   static double screenHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
+
+  static Orientation orientation(BuildContext context) =>
+      MediaQuery.of(context).orientation;
 }
+

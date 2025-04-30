@@ -2,22 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:sushi_app/models/ingredient.dart';
 
 class IngredientTable extends StatelessWidget {
+  // 1️⃣ Сначала — конструктор с super-parameter
+  const IngredientTable({
+    super.key,
+    required this.ingredients,
+    required this.onSelect,
+    required this.onUpdateGrams,
+    required this.onUpdateWaste,
+    required this.onDelete,
+  });
+
+  // 2️⃣ Затем — поля
   final List<Ingredient> ingredients;
   final void Function(int index) onSelect;
   final void Function(int index, int grams) onUpdateGrams;
   final void Function(int index, double waste) onUpdateWaste;
   final void Function(int index) onDelete;
 
-  const IngredientTable({
-    Key? key,
-    required this.ingredients,
-    required this.onSelect,
-    required this.onUpdateGrams,
-    required this.onUpdateWaste,
-    required this.onDelete,
-  }) : super(key: key);
-
-  Widget _numberField(String initialValue, Function(String) onChanged) {
+  // 3️⃣ И только потом — вспомогательные методы
+  Widget _numberField(String initialValue, void Function(String) onChanged) {
     return SizedBox(
       width: 80,
       child: TextFormField(
@@ -102,4 +105,5 @@ class IngredientTable extends StatelessWidget {
     );
   }
 }
+
 

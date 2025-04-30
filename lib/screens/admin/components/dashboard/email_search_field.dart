@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class EmailSearchField extends StatelessWidget {
-  final TextEditingController controller;
-  final void Function(String) onChanged;
-
+  // 1️⃣ Сначала — конструктор
   const EmailSearchField({
     super.key,
     required this.controller,
     required this.onChanged,
   });
+
+  // 2️⃣ Затем — поля
+  final TextEditingController controller;
+  final void Function(String) onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -26,3 +28,4 @@ class EmailSearchField extends StatelessWidget {
     );
   }
 }
+

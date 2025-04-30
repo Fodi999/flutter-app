@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import '../../../models/user.dart'; // модель пользователя
-import '../../../services/user_service.dart'; // ✅ новый сервис
+import 'package:sushi_app/models/user.dart';
+import 'package:sushi_app/services/user_service.dart';
 
 class AdminDashboardController extends ChangeNotifier {
+  // 1️⃣ Конструктор сразу после объявления класса
+  AdminDashboardController({required this.token}) {
+    fetchUsers();
+  }
+
+  // 2️⃣ Затем — поля
   final String token;
   List<User> allUsers = [];
   List<User> staff = [];
   bool isLoading = false;
   String error = '';
 
-  AdminDashboardController({required this.token}) {
-    fetchUsers();
-  }
-
+  // 3️⃣ Геттеры
   int get userCount => allUsers.length;
   int get staffCount => staff.length;
 
+  // 4️⃣ Методы
   Future<void> fetchUsers() async {
     isLoading = true;
     notifyListeners();
@@ -36,17 +40,17 @@ class AdminDashboardController extends ChangeNotifier {
     }
   }
 
-  /// Метод для использования без state management (например, в initState)
+  /// Утилитарный статический метод для получения статистики без создания контроллера
   static Future<Map<String, dynamic>?> fetchUserStats(String token) async {
     try {
       final users = await UserService.getAllUsers(token);
-      final staff = users
+      final staffList = users
           .where((u) => ['повар', 'курьер', 'официант'].contains(u.role))
           .toList();
       return {
         'userCount': users.length,
-        'staff': staff,
-        'staffCount': staff.length,
+        'staff': staffList,
+        'staffCount': staffList.length,
       };
     } catch (e) {
       debugPrint('Ошибка загрузки пользователей: $e');
@@ -54,5 +58,6 @@ class AdminDashboardController extends ChangeNotifier {
     }
   }
 }
+
 
 

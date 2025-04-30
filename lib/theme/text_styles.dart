@@ -1,34 +1,50 @@
 import 'package:flutter/material.dart';
+import 'theme_constants.dart';
 
+/// Глобальные текстовые стили без привязки к цвету
 class AppTextStyles {
-  // Заголовки
   static const TextStyle displayLarge = TextStyle(
-    fontFamily: 'Poppins',
+    fontFamily: kFontFamilyDisplay,
     fontSize: 32,
     fontWeight: FontWeight.bold,
   );
 
   static const TextStyle headlineLarge = TextStyle(
-    fontFamily: 'Poppins',
+    fontFamily: kFontFamilyDisplay,
     fontSize: 24,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w700,
   );
 
-  // Основной текст
+  static const TextStyle titleMedium = TextStyle(
+    fontFamily: kFontFamilyBody,
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  );
+
   static const TextStyle bodyLarge = TextStyle(
-    fontFamily: 'Roboto',
+    fontFamily: kFontFamilyBody,
     fontSize: 16,
+    fontWeight: FontWeight.normal,
   );
 
   static const TextStyle bodyMedium = TextStyle(
-    fontFamily: 'Roboto',
+    fontFamily: kFontFamilyBody,
     fontSize: 14,
+    fontWeight: FontWeight.normal,
   );
 
-  // Подписи и мелкий текст
   static const TextStyle labelSmall = TextStyle(
-    fontFamily: 'Roboto',
+    fontFamily: kFontFamilyBody,
     fontSize: 12,
     fontWeight: FontWeight.w400,
   );
+
+  static const TextStyle caption = TextStyle(
+    fontFamily: kFontFamilyBody,
+    fontSize: 12,
+    fontWeight: FontWeight.w300,
+  );
 }
+
+
+

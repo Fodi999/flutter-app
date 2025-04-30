@@ -1,17 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CustomInput extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final String? hintText;
-  final bool obscureText;
-  final TextInputType keyboardType;
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final bool enabled;
-
   const CustomInput({
     super.key,
     required this.controller,
@@ -26,41 +15,70 @@ class CustomInput extends StatelessWidget {
     this.enabled = true,
   });
 
+  final TextEditingController controller;
+  final String label;
+  final String? hintText;
+  final bool obscureText;
+  final TextInputType keyboardType;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scheme = Theme.of(context).colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: theme.textTheme.bodyMedium?.color?.withOpacity(0.85),
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      validator: validator,
+      enabled: enabled,
+      style: TextStyle(color: scheme.onSurface),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hintText,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        filled: true,
+        // заменили deprecated surfaceVariant
+        fillColor: scheme.surfaceContainerHighest,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          // заменили .withOpacity(0.6)
+          borderSide: BorderSide(
+            color: scheme.outline.withValues(alpha: 0.6),
           ),
         ),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          onChanged: onChanged,
-          validator: validator,
-          enabled: enabled,
-          decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon,
-            filled: true,
-            fillColor: theme.inputDecorationTheme.fillColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: theme.inputDecorationTheme.border,
-            enabledBorder: theme.inputDecorationTheme.enabledBorder,
-            focusedBorder: theme.inputDecorationTheme.focusedBorder,
-          ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
-      ],
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.error, width: 2),
+        ),
+      ),
     );
   }
 }
+
+
+
+

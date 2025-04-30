@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
-import '../../services/user_service.dart';
+import 'package:sushi_app/models/user.dart';
+import 'package:sushi_app/services/user_service.dart';
 import 'components/dashboard/email_search_field.dart';
 import 'components/user/user_card.dart';
 
 class ManageUsersScreen extends StatefulWidget {
-  final String token;
-
+  // 1️⃣ Конструктор сразу после объявления класса
   const ManageUsersScreen({super.key, required this.token});
+
+  // 2️⃣ Поле
+  final String token;
 
   @override
   State<ManageUsersScreen> createState() => _ManageUsersScreenState();
@@ -15,34 +17,49 @@ class ManageUsersScreen extends StatefulWidget {
 
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
   late Future<List<User>> _usersFuture;
-  List<User> allUsers = [];
-  List<User> filteredUsers = [];
+  List<User> _allUsers = [];
+  List<User> _filteredUsers = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    _fetchUsers();
+    _searchController.addListener(() {
+      _filterByEmail(_searchController.text);
+    });
   }
 
-  void _loadUsers() {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchUsers() async {
     _usersFuture = UserService.getAllUsers(widget.token);
-    _usersFuture.then((users) {
+    try {
+      final users = await _usersFuture;
+      if (!mounted) return;
       setState(() {
-        allUsers = users;
-        filteredUsers = users;
+        _allUsers = users;
+        _filteredUsers = users;
       });
-    });
+    } catch (_) {
+      // Ошибку здесь можно залогировать, если нужно
+    }
   }
 
   Future<void> _deleteUser(String id) async {
     try {
       await UserService.deleteUser(id, widget.token);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Пользователь удалён')),
       );
-      _loadUsers();
+      await _fetchUsers();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка удаления: $e')),
       );
@@ -52,11 +69,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   Future<void> _changeUserRole(User user, String newRole) async {
     try {
       await UserService.updateUserRole(user.id, newRole, widget.token);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Роль обновлена на $newRole')),
       );
-      _loadUsers();
+      await _fetchUsers();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка обновления роли: $e')),
       );
@@ -64,9 +83,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   }
 
   void _filterByEmail(String email) {
+    final q = email.toLowerCase();
     setState(() {
-      filteredUsers = allUsers
-          .where((user) => user.email.toLowerCase().contains(email.toLowerCase()))
+      _filteredUsers = _allUsers
+          .where((u) => u.email.toLowerCase().contains(q))
           .toList();
     });
   }
@@ -86,12 +106,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Нет пользователей'));
           }
-
+          if (snapshot.hasError) {
+            return Center(child: Text('Ошибка: ${snapshot.error}'));
+          }
+          // snapshot.data всегда не-null здесь, т.к. будущий список загружен
           return Column(
             children: [
               EmailSearchField(
@@ -101,14 +120,14 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: filteredUsers.length,
+                  itemCount: _filteredUsers.length,
                   itemBuilder: (context, index) {
-                    final user = filteredUsers[index];
+                    final user = _filteredUsers[index];
                     return UserCard(
                       user: user,
+                      index: index,
                       onDelete: () => _deleteUser(user.id),
                       onRoleChange: (role) => _changeUserRole(user, role),
-                      index: index,
                     );
                   },
                 ),
@@ -120,3 +139,4 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 }
+

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
-import '../../services/user_service.dart'; // ✅ новый импорт
+import 'package:sushi_app/models/user.dart';
+import 'package:sushi_app/services/user_service.dart';
 
 class ManageStaffScreen extends StatefulWidget {
-  final String token;
-
+  // 1️⃣ Конструктор сразу после объявления класса, с super-parameter
   const ManageStaffScreen({super.key, required this.token});
+
+  // 2️⃣ Затем — поле
+  final String token;
 
   @override
   State<ManageStaffScreen> createState() => _ManageStaffScreenState();
@@ -22,8 +24,12 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
 
   void _loadStaff() {
     _staffFuture = UserService.getAllUsers(widget.token).then((users) {
-      return users.where((user) =>
-          user.role == 'повар' || user.role == 'курьер' || user.role == 'официант').toList();
+      return users
+          .where((user) =>
+              user.role == 'повар' ||
+              user.role == 'курьер' ||
+              user.role == 'официант')
+          .toList();
     });
   }
 
@@ -44,7 +50,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
             return const Center(child: Text('Персонал не найден'));
           }
 
@@ -81,9 +87,13 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${user.name} (${user.role})',
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                              '${user.name} (${user.role})',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 4),
                             Text(user.email),
                             if (user.phone.isNotEmpty) Text(user.phone),
@@ -101,4 +111,5 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     );
   }
 }
+
 

@@ -1,95 +1,86 @@
-// theme_light.dart
-import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+// lib/theme/theme_light.dart
 
+import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_sizes.dart';
 import 'app_spacing.dart';
 import 'text_styles.dart';
 
-final colorScheme = ColorScheme.fromSeed(
-  seedColor: AppColors.primary,
-  primary: AppColors.primary,
-  secondary: AppColors.secondary,
-  surface: AppColors.surfaceLight.withOpacity(0.9),
-  brightness: Brightness.light,
-);
-
+/// Светлая тема приложения
 final ThemeData lightTheme = ThemeData(
-  brightness: Brightness.light,
+  useMaterial3: true,
+
+  // Цветовая схема на основе seedColor
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: AppColors.primary,
+    brightness: Brightness.light,
+    primary: AppColors.primary,
+    secondary: AppColors.secondary,
+    surface: AppColors.surfaceLight,
+    onPrimary: Colors.white,
+    onSecondary: Colors.black,
+    onSurface: AppColors.textPrimaryLight,
+    error: AppColors.error,
+    onError: Colors.white,
+  ),
+
+  // Фоновый цвет Scaffold
   scaffoldBackgroundColor: AppColors.backgroundLight,
-  colorScheme: colorScheme,
+
+  // Типографика
   textTheme: const TextTheme(
     displayLarge: AppTextStyles.displayLarge,
+    headlineLarge: AppTextStyles.headlineLarge,
     bodyLarge: AppTextStyles.bodyLarge,
     bodyMedium: AppTextStyles.bodyMedium,
     labelSmall: AppTextStyles.labelSmall,
   ).apply(
-    bodyColor: Colors.black,
-    displayColor: Colors.black,
+    bodyColor: AppColors.textPrimaryLight,
+    displayColor: AppColors.textPrimaryLight,
   ),
-  cardTheme: CardThemeData(
+
+  // AppBar
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.transparent,
     elevation: 0,
-    color: AppColors.glassLight,
+    iconTheme: IconThemeData(color: AppColors.primary),
+    titleTextStyle: TextStyle(
+      fontFamily: 'Roboto', // или ваш шрифт
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: AppColors.primary,
+    ),
+  ),
+
+  // Карточки
+  cardTheme: CardTheme(
+    color: AppColors.surfaceLight,
+    elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(AppSizes.radius),
     ),
-    surfaceTintColor: Colors.transparent,
-    clipBehavior: Clip.antiAlias,
   ),
+
+  // Стилизация ElevatedButton
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      foregroundColor: colorScheme.onPrimary, // ✅ исправлено
-      backgroundColor: colorScheme.primary,
+      backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusXS),
       ),
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.sm,
-        horizontal: AppSpacing.md,
-      ),
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.2),
     ),
   ),
-  inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.surfaceLight.withOpacity(0.3),
-    hintStyle: TextStyle(
-      color: Colors.grey[600],
-      fontFamily: AppTextStyles.bodyMedium.fontFamily,
-    ),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: BorderSide.none,
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
-      borderSide: const BorderSide(
-        color: AppColors.primary,
-        width: 2,
-      ),
-    ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.md,
-      vertical: AppSpacing.sm,
-    ),
-  ),
-  pageTransitionsTheme: const PageTransitionsTheme(
-    builders: {
-      TargetPlatform.android: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.windows: FadeThroughPageTransitionsBuilder(),
-      TargetPlatform.linux: FadeThroughPageTransitionsBuilder(),
-    },
-  ),
-  useMaterial3: true,
 );
+
+
+
+
+
 
 
 

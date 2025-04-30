@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:sushi_app/models/menu_item.dart';
 
 class MenuCard extends StatelessWidget {
-  final MenuItem item;
-  final VoidCallback onDelete;
-  final VoidCallback onPublish;
-
+  /// 1️⃣ Сначала — конструктор, используя super-parameter для key
   const MenuCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.onDelete,
     required this.onPublish,
-  }) : super(key: key);
+  });
+
+  /// 2️⃣ Затем — поля
+  final MenuItem item;
+  final VoidCallback onDelete;
+  final VoidCallback onPublish;
 
   @override
   Widget build(BuildContext context) {
@@ -38,29 +40,34 @@ class MenuCard extends StatelessWidget {
               else
                 const Icon(Icons.image, size: 100, color: Colors.grey),
               const SizedBox(height: 8),
-              Text(item.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(item.description,
-                  maxLines: 2, overflow: TextOverflow.ellipsis),
+              Text(
+                item.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                item.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
               const SizedBox(height: 6),
-              Text('${item.price.toStringAsFixed(2)} ₽',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                '${item.price.toStringAsFixed(2)} ₽',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Кнопка публикации
                   IconButton(
                     icon: Icon(
-                      item.published
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      item.published ? Icons.visibility : Icons.visibility_off,
                       color: item.published ? Colors.green : Colors.grey,
                     ),
                     onPressed: onPublish,
                   ),
-                  // Кнопка удаления
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: onDelete,
@@ -74,6 +81,7 @@ class MenuCard extends StatelessWidget {
     );
   }
 }
+
 
 
 

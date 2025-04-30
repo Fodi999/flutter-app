@@ -1,56 +1,43 @@
+// lib/components/custom_card.dart
 import 'package:flutter/material.dart';
 
 class CustomCard extends StatelessWidget {
+  /// Контент карточки
   final Widget child;
-  final EdgeInsetsGeometry padding;
-  final EdgeInsetsGeometry margin;
-  final double borderRadius;
-  final Color? color;
+  /// Обработчик тапов (InkWell)
   final VoidCallback? onTap;
-  final bool shadow;
+  /// Внешние отступы вокруг самой Card
+  final EdgeInsetsGeometry margin;
+  /// Скругление углов
+  final BorderRadiusGeometry borderRadius;
+  /// Внутренние отступы для контента внутри InkWell
+  final EdgeInsetsGeometry? padding;
 
   const CustomCard({
-    super.key,
+    Key? key,
     required this.child,
-    this.padding = const EdgeInsets.all(16),
-    this.margin = const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-    this.borderRadius = 16,
-    this.color,
     this.onTap,
-    this.shadow = true,
-  });
+    this.margin = const EdgeInsets.all(12),
+    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.padding,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final backgroundColor = color ?? theme.cardColor;
-
-    return Container(
+    return Card(
+      elevation: 4,
       margin: margin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: shadow
-            ? [
-                BoxShadow(
-                  color: theme.shadowColor.withOpacity(0.05),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ]
-            : [],
-      ),
-      child: Material(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
-        ),
+      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: padding != null
+            ? Padding(padding: padding!, child: child)
+            : child,
       ),
     );
   }
 }
+
+
+

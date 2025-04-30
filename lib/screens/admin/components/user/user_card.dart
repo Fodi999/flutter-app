@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../models/user.dart';
-import 'role_translator.dart';
+import 'package:sushi_app/models/user.dart';
+import 'package:sushi_app/screens/admin/components/user/role_translator.dart';
 
 class UserCard extends StatelessWidget {
-  final User user;
-  final VoidCallback onDelete;
-  final void Function(String) onRoleChange;
-  final int index;
-
+  // 1️⃣ Конструктор сразу после объявления класса, с super-parameter
   const UserCard({
     super.key,
     required this.user,
@@ -15,6 +11,12 @@ class UserCard extends StatelessWidget {
     required this.onRoleChange,
     required this.index,
   });
+
+  // 2️⃣ Затем — поля
+  final User user;
+  final VoidCallback onDelete;
+  final void Function(String) onRoleChange;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class UserCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header: avatar + name/email
               Row(
                 children: [
                   CircleAvatar(
@@ -37,7 +40,8 @@ class UserCard extends StatelessWidget {
                     backgroundColor: Colors.green.shade100,
                     child: Text(
                       user.avatarLetter,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -47,7 +51,8 @@ class UserCard extends StatelessWidget {
                       children: [
                         Text(
                           '${user.name} (${translateRoleToEN(user.role)})',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         Text(user.email, style: const TextStyle(fontSize: 13)),
                       ],
@@ -56,17 +61,16 @@ class UserCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
+              // Info rows
               _infoRow(Icons.vpn_key, 'ID: ${user.id}'),
               _infoRow(Icons.phone, user.phone),
-              if (user.address != null)
-                _infoRow(Icons.home, 'Address: ${user.address!}'),
-              if (user.bio != null)
-                _infoRow(Icons.info_outline, 'About: ${user.bio!}'),
-              if (user.birthday != null)
-                _infoRow(Icons.cake, 'Birthday: ${user.birthday!}'),
+              _infoRow(Icons.home, 'Address: ${user.address}'),
+              _infoRow(Icons.info_outline, 'About: ${user.bio}'),
+              _infoRow(Icons.cake, 'Birthday: ${user.birthday}'),
               _infoRow(Icons.calendar_today, 'Created: ${user.createdAt}'),
               _infoRow(Icons.access_time, 'Last active: ${user.lastActive}'),
               const SizedBox(height: 12),
+              // Role selector + delete button
               Row(
                 children: [
                   Expanded(
@@ -75,7 +79,8 @@ class UserCard extends StatelessWidget {
                       decoration: const InputDecoration(
                         labelText: 'Role',
                         border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       items: const [
                         DropdownMenuItem(value: 'admin', child: Text('Admin')),
@@ -138,6 +143,7 @@ class UserCard extends StatelessWidget {
     );
   }
 
+  // 3️⃣ В конце — вспомогательный метод
   Widget _infoRow(IconData icon, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -146,12 +152,12 @@ class UserCard extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: Colors.grey.shade700),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 14)),
-          ),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
         ],
       ),
     );
   }
 }
+
+
 

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DashboardCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final Color color;
-  final Widget? bottomChild; // ⬅️ добавлен параметр
-
+  // 1. Конструктор сразу после объявления класса
   const DashboardCard({
     super.key,
     required this.icon,
@@ -16,17 +11,25 @@ class DashboardCard extends StatelessWidget {
     this.bottomChild,
   });
 
+  // 2. Затем — поля
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color color;
+  final Widget? bottomChild;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBackground = isDark ? Colors.grey[900] : Colors.white;
-    final borderColor = isDark ? Colors.grey[800] : Colors.grey[300];
+    // Используем .shadeXXX, чтобы цвет был non-nullable
+    final cardBackground = isDark ? Colors.grey.shade900 : Colors.white;
+    final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
 
     return Container(
       decoration: BoxDecoration(
         color: cardBackground,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor!),
+        border: Border.all(color: borderColor),
       ),
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
       margin: const EdgeInsets.only(right: 16),
@@ -38,7 +41,8 @@ class DashboardCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  // Заменили withOpacity на withValues
+                  color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -53,7 +57,7 @@ class DashboardCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         letterSpacing: 1,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -78,6 +82,7 @@ class DashboardCard extends StatelessWidget {
     );
   }
 }
+
 
 
 

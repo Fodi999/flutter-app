@@ -7,7 +7,8 @@ final _logger = Logger(
     errorMethodCount: 5,
     colors: true,
     printEmojis: true,
-    printTime: true,
+    // Вместо устаревшего printTime используем dateTimeFormat
+    dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
   ),
 );
 

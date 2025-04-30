@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final IconData? icon;
-  final bool fullWidth;
-  final Color? color;
-
+  // 1. Конструктор сразу после объявления класса
   const PrimaryButton({
     super.key,
     required this.text,
@@ -16,21 +11,29 @@ class PrimaryButton extends StatelessWidget {
     this.color,
   });
 
+  // 2. Затем — поля
+  final String text;
+  final VoidCallback onPressed;
+  final IconData? icon;
+  final bool fullWidth;
+  final Color? color;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = color ?? theme.colorScheme.primary;
 
-    // 🔍 Определим текстовый цвет в зависимости от переданного цвета
+    // Определяем цвет текста
     final isPrimary = color == null || color == theme.colorScheme.primary;
     final textColor = isPrimary
         ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurface.withOpacity(0.8); // для светлого фона
+        : theme.colorScheme.onSurface.withValues(alpha: 0.8);
 
     final button = InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(32),
-      splashColor: bgColor.withOpacity(0.2),
+      // Используем withValues вместо deprecated withOpacity
+      splashColor: bgColor.withValues(alpha: 0.2),
       highlightColor: Colors.transparent,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -38,22 +41,22 @@ class PrimaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(32),
           gradient: LinearGradient(
-            colors: [
-              bgColor.withOpacity(0.9),
-              bgColor.withOpacity(0.7),
-            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            colors: [
+              bgColor.withValues(alpha: 0.9),
+              bgColor.withValues(alpha: 0.7),
+            ],
           ),
           boxShadow: [
             BoxShadow(
-              color: bgColor.withOpacity(0.25),
+              color: bgColor.withValues(alpha: 0.25),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
           ],
           border: Border.all(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
           ),
         ),
         child: Row(
@@ -83,6 +86,7 @@ class PrimaryButton extends StatelessWidget {
         : button;
   }
 }
+
 
 
 

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:sushi_app/models/user.dart';
 
 class StaffList extends StatefulWidget {
-  final List<User> staff;
-
+  // 1️⃣ Конструктор сразу после объявления класса
   const StaffList({super.key, required this.staff});
+
+  // 2️⃣ Затем — поля
+  final List<User> staff;
 
   @override
   State<StaffList> createState() => _StaffListState();
@@ -52,11 +54,16 @@ class _StaffListState extends State<StaffList> {
               final user = filteredStaff[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.green.shade100,
-                    child: Text(user.avatarLetter, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      user.avatarLetter,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   title: Text('${user.name} (${user.role})'),
                   subtitle: Text(user.email),
@@ -69,3 +76,4 @@ class _StaffListState extends State<StaffList> {
     );
   }
 }
+

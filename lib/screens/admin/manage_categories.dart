@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../models/category.dart';
-import '../../../services/category_service.dart';
-import 'manage_menu_items.dart';
+import 'package:sushi_app/models/category.dart';
+import 'package:sushi_app/services/category_service.dart';
+import 'package:sushi_app/screens/admin/manage_menu_items.dart';
 
 class ManageCategoriesScreen extends StatefulWidget {
-  final String token;
-
   const ManageCategoriesScreen({super.key, required this.token});
+
+  final String token;
 
   @override
   State<ManageCategoriesScreen> createState() => _ManageCategoriesScreenState();
@@ -39,7 +39,10 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen> {
   Future<void> _createCategory() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await CategoryService.createCategory(_nameController.text.trim(), widget.token);
+        await CategoryService.createCategory(
+          _nameController.text.trim(),
+          widget.token,
+        );
         _nameController.clear();
         _showSnackBar('Категория создана');
         setState(() => _loadCategories());
@@ -66,7 +69,10 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Категории меню', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'Категории меню',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 16),
           Form(
             key: _formKey,
@@ -141,6 +147,7 @@ class _ManageCategoriesScreenState extends State<ManageCategoriesScreen> {
     );
   }
 }
+
 
 
 

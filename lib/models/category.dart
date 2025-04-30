@@ -1,8 +1,6 @@
 class Category {
-  final String id;
-  final String name;
-
-  Category({
+  // 1. Сразу после заголовка класса — все конструкторы
+  const Category({
     required this.id,
     required this.name,
   });
@@ -14,6 +12,11 @@ class Category {
     );
   }
 
+  // 2. Затем — все поля
+  final String id;
+  final String name;
+
+  // 3. И только потом — остальные методы
   Map<String, dynamic> toJson() {
     return {
       'id': id,

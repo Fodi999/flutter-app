@@ -1,19 +1,6 @@
 class User {
-  final String id;
-  final String name;
-  final String email;
-  final String phone;
-  final String role;
-  final String address;
-  final String bio;
-  final String birthday;
-  final DateTime createdAt;
-  final DateTime lastActive;
-  final bool online;
-  final int orders;
-  final String avatarLetter;
-
-  User({
+  // 1️⃣ Сначала — конструкторы
+  const User({
     required this.id,
     required this.name,
     required this.email,
@@ -30,24 +17,43 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    final name = json['name'] ?? '';
+    final nameValue = json['name'] as String? ?? '';
     return User(
-      id: json['id'] ?? '',
-      name: name,
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      role: json['role'] ?? 'user',
-      address: json['address'] ?? '',
-      bio: json['bio'] ?? '',
-      birthday: json['birthday'] ?? '',
-      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
-      lastActive: DateTime.tryParse(json['last_active'] ?? '') ?? DateTime.now(),
-      online: json['online'] ?? false,
-      orders: json['orders'] ?? 0,
-      avatarLetter: json['avatar_letter'] ?? (name.isNotEmpty ? name[0].toUpperCase() : '?'),
+      id: json['id'] as String? ?? '',
+      name: nameValue,
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      role: json['role'] as String? ?? 'user',
+      address: json['address'] as String? ?? '',
+      bio: json['bio'] as String? ?? '',
+      birthday: json['birthday'] as String? ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      lastActive: DateTime.tryParse(json['last_active'] as String? ?? '') ??
+          DateTime.now(),
+      online: json['online'] as bool? ?? false,
+      orders: json['orders'] as int? ?? 0,
+      avatarLetter: json['avatar_letter'] as String? ??
+          (nameValue.isNotEmpty ? nameValue[0].toUpperCase() : '?'),
     );
   }
 
+  // 2️⃣ Затем — поля
+  final String id;
+  final String name;
+  final String email;
+  final String phone;
+  final String role;
+  final String address;
+  final String bio;
+  final String birthday;
+  final DateTime createdAt;
+  final DateTime lastActive;
+  final bool online;
+  final int orders;
+  final String avatarLetter;
+
+  // 3️⃣ И только потом — остальные методы
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -66,4 +72,5 @@ class User {
     };
   }
 }
+
 

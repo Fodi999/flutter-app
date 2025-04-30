@@ -16,16 +16,18 @@ import 'components/dashboard/form/menu_card.dart';
 import 'components/dashboard/form/ingredient_picker.dart';
 
 class ManageMenuItemsScreen extends StatefulWidget {
-  final String token;
-  final String categoryId;
-  final String categoryName;
-
+  // 1️⃣ Конструктор сразу после заголовка класса, с super-parameter
   const ManageMenuItemsScreen({
-    Key? key,
+    super.key,
     required this.token,
     required this.categoryId,
     required this.categoryName,
-  }) : super(key: key);
+  });
+
+  // 2️⃣ Затем — поля
+  final String token;
+  final String categoryId;
+  final String categoryName;
 
   @override
   State<ManageMenuItemsScreen> createState() => _ManageMenuItemsScreenState();

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppTitle extends StatelessWidget {
-  final double fontSize;
-  final bool animate;
-
+  // 1. Конструктор – сразу после объявления класса
   const AppTitle({
     super.key,
     this.fontSize = 40,
     this.animate = true,
   });
+
+  // 2. Затем — поля
+  final double fontSize;
+  final bool animate;
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +19,15 @@ class AppTitle extends StatelessWidget {
 
     final gradient = LinearGradient(
       colors: isDark
-          ? [
-              const Color(0xFFB9F6CA),
-              const Color(0xFF69F0AE),
-              const Color(0xFF00E676),
+          ? const [
+              Color(0xFFB9F6CA),
+              Color(0xFF69F0AE),
+              Color(0xFF00E676),
             ]
-          : [
-              const Color(0xFF4CAF50),
-              const Color(0xFF2E7D32),
-              const Color(0xFF1B5E20),
+          : const [
+              Color(0xFF4CAF50),
+              Color(0xFF2E7D32),
+              Color(0xFF1B5E20),
             ],
     );
 
@@ -34,11 +36,13 @@ class AppTitle extends StatelessWidget {
       fontWeight: FontWeight.bold,
       letterSpacing: 1.5,
       foreground: Paint()
-        ..shader = gradient.createShader(const Rect.fromLTWH(0, 0, 200, 70)),
+        ..shader = gradient.createShader(
+          const Rect.fromLTWH(0, 0, 200, 70),
+        ),
     );
 
     final child = Text(
-      'SushiRobot',
+      'FISH IN HOUSE',
       textAlign: TextAlign.center,
       style: textStyle,
     );
@@ -59,4 +63,5 @@ class AppTitle extends StatelessWidget {
         : child;
   }
 }
+
 

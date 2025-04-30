@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
 
 class MenuItemForm extends StatelessWidget {
+  // 1️⃣ Конструктор сразу после объявления класса, с super-parameter
+  const MenuItemForm({
+    super.key,
+    required this.nameController,
+    required this.descController,
+    required this.imageController,
+    required this.priceController,
+    required this.onAddIngredient,
+  });
+
+  // 2️⃣ Затем — поля
   final TextEditingController nameController;
   final TextEditingController descController;
   final TextEditingController imageController;
   final TextEditingController priceController;
   final VoidCallback onAddIngredient;
 
-  const MenuItemForm({
-    Key? key,
-    required this.nameController,
-    required this.descController,
-    required this.imageController,
-    required this.priceController,
-    required this.onAddIngredient,
-  }) : super(key: key);
-
+  // 3️⃣ Вспомогательный метод
   Widget _buildTextField(
-      TextEditingController c, String label, bool number) {
+    TextEditingController controller,
+    String label,
+    bool number,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
-        controller: c,
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
           isDense: true,
         ),
-        keyboardType:
-            number ? TextInputType.number : TextInputType.text,
+        keyboardType: number ? TextInputType.number : TextInputType.text,
       ),
     );
   }
@@ -42,9 +47,10 @@ class MenuItemForm extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text('Добавить блюдо',
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Добавить блюдо',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             _buildTextField(nameController, 'Название', false),
             _buildTextField(descController, 'Описание', false),
@@ -62,3 +68,4 @@ class MenuItemForm extends StatelessWidget {
     );
   }
 }
+

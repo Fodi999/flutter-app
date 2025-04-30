@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+
 import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/components/app_title.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
-import 'package:sushi_app/theme/theme_typography.dart';
+import 'package:sushi_app/theme/locale_provider.dart';
 import 'package:sushi_app/utils/responsive.dart';
+
 import 'register_screen.dart';
 import 'login_screen.dart';
 
@@ -68,6 +72,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Получаем переводы
+    final loc = AppLocalizations.of(context)!;
+    // Провайдер для переключения языка
+    final localeProvider = context.watch<LocaleProvider>();
+    final isRu = localeProvider.locale.languageCode == 'ru';
+
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final isDesktop = Responsive.isDesktop(context);
@@ -79,6 +89,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          // Переключатель языка
+          IconButton(
+            onPressed: localeProvider.toggleLocale,
+            icon: Text(
+              isRu ? '🇷🇺' : '🇬🇧',
+              style: const TextStyle(fontSize: 24),
+            ),
+            tooltip: isRu ? loc.switchToEnglish : loc.switchToRussian,
+          ),
+          // Переключатель темы
           IconButton(
             onPressed: widget.onToggleTheme,
             icon: Icon(
@@ -100,10 +120,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Название приложения
                   const AppTitle(fontSize: 48, animate: true),
                   const SizedBox(height: AppSpacing.sm),
+                  // Локализованный слоган
                   Text(
-                    'Доставка суши к вашей двери\nЗакажите свежие суши прямо сейчас!',
+                    loc.slogan,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -112,27 +134,31 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
+                  // Фичи
                   for (int i = 0; i < 3; i++) ...[
                     AnimatedBuilder(
                       animation: _controller,
                       builder: (context, child) {
+                        String text;
+                        IconData icon;
+                        switch (i) {
+                          case 0:
+                            icon = Icons.check_circle;
+                            text = loc.freshIngredients;
+                            break;
+                          case 1:
+                            icon = Icons.local_shipping;
+                            text = loc.fastOrder;
+                            break;
+                          default:
+                            icon = Icons.verified_user;
+                            text = loc.qualitySafety;
+                        }
                         return Opacity(
                           opacity: _fadeAnimations[i].value,
                           child: Transform.translate(
                             offset: _slideAnimations[i].value * 20,
-                            child: _buildFeatureBox(
-                              context,
-                              i == 0
-                                  ? Icons.check_circle
-                                  : i == 1
-                                      ? Icons.local_shipping
-                                      : Icons.verified_user,
-                              i == 0
-                                  ? 'Свежие ингредиенты'
-                                  : i == 1
-                                      ? 'Быстрое оформление заказа'
-                                      : 'Качество и безопасность',
-                            ),
+                            child: _buildFeatureBox(context, icon, text),
                           ),
                         );
                       },
@@ -142,11 +168,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                   const SizedBox(height: AppSpacing.lg),
 
+                  // Кнопки входа и регистрации
                   Row(
                     children: [
                       Expanded(
                         child: PrimaryButton(
-                          text: 'Вход',
+                          text: loc.login,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -158,13 +185,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               ),
                             );
                           },
-                          color: theme.colorScheme.surface.withOpacity(0.05),
+                          color:
+                              theme.colorScheme.surface.withOpacity(0.05),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: PrimaryButton(
-                          text: 'Регистрация',
+                          text: loc.register,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -189,7 +217,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildFeatureBox(BuildContext context, IconData icon, String text) {
+  Widget _buildFeatureBox(
+      BuildContext context, IconData icon, String text) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
 
@@ -209,7 +238,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
+            backgroundColor:
+                theme.colorScheme.primary.withOpacity(0.2),
             child: Icon(icon, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -227,19 +257,5 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

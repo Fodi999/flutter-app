@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/user.dart';
-import '../../models/menu_item.dart';
-import '../../theme/theme_provider.dart';
-import '../../services/user_service.dart';
-import '../../services/menu_service.dart';
-import 'controllers/admin_dashboard_controller.dart';
-import 'manage_users.dart';
-import 'manage_categories.dart';
-import 'manage_inventory.dart';
-import 'components/dashboard/sidebar_item.dart';
-import 'components/dashboard/dashboard_card.dart';
-import 'components/dashboard/staff_list.dart';
+
+import 'package:sushi_app/models/user.dart';
+import 'package:sushi_app/theme/theme_provider.dart';
+import 'package:sushi_app/services/menu_service.dart';
+
+import 'package:sushi_app/screens/admin/controllers/admin_dashboard_controller.dart';
+import 'package:sushi_app/screens/admin/manage_users.dart';
+import 'package:sushi_app/screens/admin/manage_categories.dart';
+import 'package:sushi_app/screens/admin/manage_inventory.dart';
+
+import 'package:sushi_app/screens/admin/components/dashboard/sidebar_item.dart';
+import 'package:sushi_app/screens/admin/components/dashboard/dashboard_card.dart';
+import 'package:sushi_app/screens/admin/components/dashboard/staff_list.dart';
 
 class AdminDashboard extends StatefulWidget {
-  final User user;
-  final String token;
-
+  // 1. Конструктор сразу после заголовка класса
   const AdminDashboard({
     super.key,
     required this.user,
     required this.token,
   });
+
+  // 2. Затем — поля
+  final User user;
+  final String token;
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
@@ -31,8 +34,9 @@ class _AdminDashboardState extends State<AdminDashboard>
     with SingleTickerProviderStateMixin {
   String currentPage = 'dashboard';
   bool isSidebarOpen = true;
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
+
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
 
   int userCount = 0;
   int staffCount = 0;
@@ -47,36 +51,40 @@ class _AdminDashboardState extends State<AdminDashboard>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
     _controller.forward();
     _loadDashboardData();
-  }
-
-  Future<void> _loadDashboardData() async {
-    final result = await AdminDashboardController.fetchUserStats(widget.token);
-    final menuItems = await MenuService.getMenuWithCategory(widget.token); // ✅ исправлено
-
-    if (result != null) {
-      final Map<String, int> counts = {};
-      for (var item in menuItems) {
-        final name = item.categoryName ?? 'Без категории';
-        counts[name] = (counts[name] ?? 0) + 1;
-      }
-
-      setState(() {
-        userCount = result['userCount'];
-        staff = result['staff'];
-        staffCount = result['staffCount'];
-        menuItemCount = menuItems.length;
-        categoryCounts = counts;
-      });
-    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDashboardData() async {
+    final result =
+        await AdminDashboardController.fetchUserStats(widget.token);
+    final menuItems =
+        await MenuService.getMenuWithCategory(widget.token);
+
+    if (result != null) {
+      final counts = <String, int>{};
+      for (var item in menuItems) {
+        final name = item.categoryName ?? 'Без категории';
+        counts[name] = (counts[name] ?? 0) + 1;
+      }
+      setState(() {
+        userCount = result['userCount'] as int;
+        staff = List<User>.from(result['staff'] as List);
+        staffCount = result['staffCount'] as int;
+        menuItemCount = menuItems.length;
+        categoryCounts = counts;
+      });
+    }
   }
 
   Widget _buildContent() {
@@ -125,10 +133,12 @@ class _AdminDashboardState extends State<AdminDashboard>
                         color: Colors.orange,
                         bottomChild: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: categoryCounts.entries.map((entry) => Text(
-                            '${entry.key}: ${entry.value}',
-                            style: const TextStyle(fontSize: 12),
-                          )).toList(),
+                          children: categoryCounts.entries
+                              .map((e) => Text(
+                                    '${e.key}: ${e.value}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ))
+                              .toList(),
                         ),
                       ),
                     ),
@@ -151,9 +161,10 @@ class _AdminDashboardState extends State<AdminDashboard>
                     const SizedBox(width: 16),
                     Text(
                       'Здравствуйте, ${widget.user.name} (админ)',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -190,9 +201,8 @@ class _AdminDashboardState extends State<AdminDashboard>
                       key: ValueKey(isSidebarOpen),
                     ),
                   ),
-                  onPressed: () {
-                    setState(() => isSidebarOpen = !isSidebarOpen);
-                  },
+                  onPressed: () =>
+                      setState(() => isSidebarOpen = !isSidebarOpen),
                 ),
                 const SizedBox(height: 16),
                 SidebarItem(
@@ -291,6 +301,8 @@ class _AdminDashboardState extends State<AdminDashboard>
     );
   }
 }
+
+
 
 
 

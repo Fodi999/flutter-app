@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 class CalculationPanel extends StatelessWidget {
-  final double cost;
-  final int output;
-  final VoidCallback onSave;
-  final VoidCallback onClear;
-
+  // 1. Конструктор сразу после заголовка класса, с использованием super-parameters
   const CalculationPanel({
-    Key? key,
+    super.key,
     required this.cost,
     required this.output,
     required this.onSave,
     required this.onClear,
-  }) : super(key: key);
+  });
+
+  // 2. Затем — поля
+  final double cost;
+  final int output;
+  final VoidCallback onSave;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -53,3 +55,4 @@ class CalculationPanel extends StatelessWidget {
     );
   }
 }
+
