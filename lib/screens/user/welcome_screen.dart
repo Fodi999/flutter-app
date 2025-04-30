@@ -1,6 +1,8 @@
+// lib/screens/user/welcome_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/components/app_title.dart';
@@ -50,12 +52,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       );
     });
-
     _fadeAnimations = List.generate(3, (index) {
-      return Tween<double>(
-        begin: 0,
-        end: 1,
-      ).animate(
+      return Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(
           parent: _controller,
           curve: Interval(0.2 * index, 0.6 + index * 0.2, curve: Curves.easeOut),
@@ -72,11 +70,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Получаем переводы
-    final loc = AppLocalizations.of(context)!;
-    // Провайдер для переключения языка
+    final t = translate;                             // shorthand
     final localeProvider = context.watch<LocaleProvider>();
-    final isRu = localeProvider.locale.languageCode == 'ru';
+    final isRu = localeProvider.localeCode == 'ru';
 
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
@@ -89,16 +85,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          // Переключатель языка
           IconButton(
-            onPressed: localeProvider.toggleLocale,
+            onPressed: () => localeProvider.toggleLocale(context),
             icon: Text(
               isRu ? '🇷🇺' : '🇬🇧',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: isRu ? loc.switchToEnglish : loc.switchToRussian,
+            tooltip: isRu ? t('switchToEnglish') : t('switchToRussian'),
           ),
-          // Переключатель темы
           IconButton(
             onPressed: widget.onToggleTheme,
             icon: Icon(
@@ -120,12 +114,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Название приложения
                   const AppTitle(fontSize: 48, animate: true),
                   const SizedBox(height: AppSpacing.sm),
-                  // Локализованный слоган
                   Text(
-                    loc.slogan,
+                    t('slogan'),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -134,25 +126,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Фичи
                   for (int i = 0; i < 3; i++) ...[
                     AnimatedBuilder(
                       animation: _controller,
                       builder: (context, child) {
-                        String text;
-                        IconData icon;
-                        switch (i) {
-                          case 0:
-                            icon = Icons.check_circle;
-                            text = loc.freshIngredients;
-                            break;
-                          case 1:
-                            icon = Icons.local_shipping;
-                            text = loc.fastOrder;
-                            break;
-                          default:
-                            icon = Icons.verified_user;
-                            text = loc.qualitySafety;
+                        late final IconData icon;
+                        late final String text;
+                        if (i == 0) {
+                          icon = Icons.check_circle;
+                          text = t('freshIngredients');
+                        } else if (i == 1) {
+                          icon = Icons.local_shipping;
+                          text = t('fastOrder');
+                        } else {
+                          icon = Icons.verified_user;
+                          text = t('qualitySafety');
                         }
                         return Opacity(
                           opacity: _fadeAnimations[i].value,
@@ -168,42 +156,36 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Кнопки входа и регистрации
                   Row(
                     children: [
                       Expanded(
                         child: PrimaryButton(
-                          text: loc.login,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => LoginScreen(
-                                  isDarkMode: widget.isDarkMode,
-                                  onToggleTheme: widget.onToggleTheme,
-                                ),
+                          text: t('login'),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => LoginScreen(
+                                isDarkMode: widget.isDarkMode,
+                                onToggleTheme: widget.onToggleTheme,
                               ),
-                            );
-                          },
-                          color:
-                              theme.colorScheme.surface.withOpacity(0.05),
+                            ),
+                          ),
+                          color: theme.colorScheme.surface.withOpacity(0.05),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: PrimaryButton(
-                          text: loc.register,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => RegisterScreen(
-                                  isDarkMode: widget.isDarkMode,
-                                  onToggleTheme: widget.onToggleTheme,
-                                ),
+                          text: t('register'),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => RegisterScreen(
+                                isDarkMode: widget.isDarkMode,
+                                onToggleTheme: widget.onToggleTheme,
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -217,11 +199,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildFeatureBox(
-      BuildContext context, IconData icon, String text) {
+  Widget _buildFeatureBox(BuildContext context, IconData icon, String text) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
-
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withOpacity(0.05),
@@ -238,8 +218,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor:
-                theme.colorScheme.primary.withOpacity(0.2),
+            backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
             child: Icon(icon, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -257,5 +236,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
 
 

@@ -1,16 +1,17 @@
 name: sushi_app
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if вы хотите публиковать проект
+publish_to: 'none' # Уберите эту строку, если захотите публиковать пакет
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.7.0 <4.0.0' # ✅ Обновлено для Dart 3.7+
+  sdk: '>=3.7.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
+  # Основные пакеты
   cupertino_icons: ^1.0.6
   http: ^1.3.0
   provider: ^6.1.1
@@ -18,25 +19,24 @@ dependencies:
   logger: ^2.0.2
   animations: ^2.0.2
   shared_preferences: ^2.2.2
-  flutter_localizations: # ✅ Для локализаций
-    sdk: flutter
 
+  # Локализация
+  flutter_localizations:
+    sdk: flutter
+  flutter_translate: ^4.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0 # ✅ Обновлено до последней версии
-  intl_utils: ^2.8.5 # ✅ Для генерации локализаций через Flutter Intl
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
-  generate: true # ✅ Чтобы разрешить автоматическую генерацию локализаций
 
-flutter_intl:
-  enabled: true # ✅ Включена поддержка Flutter Intl
-  arb_dir: lib/l10n
-  output_dir: lib/generated
-  class_name: S
+  # Папка с вашими JSON-локалями
+  assets:
+    - assets/i18n/en.json
+    - assets/i18n/ru.json
 
 
 

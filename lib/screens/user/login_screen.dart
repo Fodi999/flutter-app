@@ -1,6 +1,8 @@
+// lib/screens/user/login_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 // widgets
 import 'package:sushi_app/components/custom_input.dart';
@@ -35,46 +37,44 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _email = TextEditingController();
-  final _pass  = TextEditingController();
+  final _pass = TextEditingController();
 
-  bool   _loading = false;
+  bool _loading = false;
   String? _error;
 
   Future<void> _handleLogin() async {
-    // блокируем кнопку
     setState(() {
       _loading = true;
-      _error   = null;
+      _error = null;
     });
 
     try {
-      final email    = _email.text.trim();
+      final email = _email.text.trim();
       final password = _pass.text;
 
-      final res   = await AuthService.login(email, password);
+      final res = await AuthService.login(email, password);
       final token = res['token'] as String;
-      final id    = res['id']    as String;
-      final role  = res['role']  as String;
+      final id = res['id'] as String;
+      final role = res['role'] as String;
 
       if (!mounted) return;
 
       if (role == 'admin') {
         final admin = User(
-          id           : id,
-          name         : 'Admin',
-          email        : email,
-          phone        : '',
-          role         : role,
-          address      : '',
-          bio          : '',
-          birthday     : '',
-          createdAt    : DateTime.now(),
-          lastActive   : DateTime.now(),
-          online       : true,
-          orders       : 0,
-          avatarLetter : 'A',
+          id: id,
+          name: 'Admin',
+          email: email,
+          phone: '',
+          role: role,
+          address: '',
+          bio: '',
+          birthday: '',
+          createdAt: DateTime.now(),
+          lastActive: DateTime.now(),
+          online: true,
+          orders: 0,
+          avatarLetter: 'A',
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -84,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         final user = await UserService.getUserById(id, token);
         if (!mounted) return;
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -96,18 +95,20 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) setState(() => _error = e.toString());
     }
 
-    // разблокируем кнопку
     if (mounted) setState(() => _loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final loc            = AppLocalizations.of(context)!;
-    final theme          = Theme.of(context);
-    final cs             = theme.colorScheme;
-    final dt             = theme.textTheme;
+    // функция перевода
+    final t = translate;
+
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final dt = theme.textTheme;
+
     final localeProvider = context.watch<LocaleProvider>();
-    final isRu           = localeProvider.locale.languageCode == 'ru';
+    final isRu = localeProvider.localeCode == 'ru';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -116,11 +117,18 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         leading: BackButton(color: cs.primary),
         actions: [
+          // Переключатель языка
           IconButton(
-            onPressed: localeProvider.toggleLocale,
-            icon: Text(isRu ? '🇷🇺' : '🇬🇧', style: const TextStyle(fontSize: 24)),
-            tooltip: isRu ? loc.switchToEnglish : loc.switchToRussian,
+            onPressed: () => localeProvider.toggleLocale(context),
+            icon: Text(
+              isRu ? '🇷🇺' : '🇬🇧',
+              style: const TextStyle(fontSize: 24),
+            ),
+            tooltip: isRu
+                ? 'Switch to English'
+                : 'Переключить на русский',
           ),
+          // Переключатель темы
           IconButton(
             onPressed: widget.onToggleTheme,
             icon: Icon(
@@ -135,37 +143,46 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.lg * 1.5,
-              vertical:   AppSpacing.lg,
+              vertical: AppSpacing.lg,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(loc.login, textAlign: TextAlign.center, style: dt.displayLarge),
+                // Заголовок
+                Text(
+                  t('login'),
+                  textAlign: TextAlign.center,
+                  style: dt.displayLarge,
+                ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(loc.loginSubtitle, textAlign: TextAlign.center, style: dt.bodyMedium),
+                Text(
+                  t('loginSubtitle'),
+                  textAlign: TextAlign.center,
+                  style: dt.bodyMedium,
+                ),
                 const SizedBox(height: AppSpacing.xl),
 
-                // email
+                // Email
                 CustomInput(
-                  controller  : _email,
-                  label       : loc.email,
-                  hintText    : loc.enterEmail,
-                  prefixIcon  : const Icon(Icons.email),
+                  controller: _email,
+                  label: t('email'),
+                  hintText: t('enterEmail'),
+                  prefixIcon: const Icon(Icons.email),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // password
+                // Password
                 CustomInput(
-                  controller : _pass,
-                  label      : loc.password,
-                  hintText   : loc.enterPassword,
-                  prefixIcon : const Icon(Icons.lock),
+                  controller: _pass,
+                  label: t('password'),
+                  hintText: t('enterPassword'),
+                  prefixIcon: const Icon(Icons.lock),
                   obscureText: true,
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // сообщение об ошибке
+                // Ошибка входа
                 if (_error != null) ...[
                   Text(
                     _error!,
@@ -175,12 +192,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.md),
                 ],
 
-                // кнопка входа
+                // Кнопка входа
                 PrimaryButton(
-                  text: loc.login,
-                  // всегда передаём ненулевой VoidCallback
+                  text: t('login'),
                   onPressed: () {
-                    if (_loading) return;      // игнор повторного нажатия
+                    if (_loading) return;
                     _handleLogin();
                   },
                 ),
@@ -192,3 +208,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

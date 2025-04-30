@@ -1,6 +1,8 @@
+// lib/screens/user/register_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 import 'package:sushi_app/components/custom_input.dart';
 import 'package:sushi_app/components/primary_button.dart';
@@ -73,25 +75,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tr            = AppLocalizations.of(context)!;
-    final theme         = Theme.of(context);
-    final textColor     = theme.textTheme.bodyLarge?.color ?? Colors.white;
-    final fadedTextColor= textColor.withAlpha((0.6 * 255).round());
-    final localeProvider = Provider.of<LocaleProvider>(context);
-    final isRussian      = localeProvider.locale.languageCode == 'ru';
+    // shorthand for translate
+    final t = translate;
+
+    final theme          = Theme.of(context);
+    final textColor      = theme.textTheme.bodyLarge?.color ?? Colors.white;
+    final fadedTextColor = textColor.withOpacity(0.6);
+
+    final localeProvider = context.watch<LocaleProvider>();
+    final isRussian      = localeProvider.localeCode == 'ru';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(tr.register),
+        title: Text(t('register')),
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: localeProvider.toggleLocale,
-            icon: Text(isRussian ? '🇷🇺' : '🇬🇧', style: const TextStyle(fontSize: 24)),
-            tooltip: isRussian ? tr.switchToEnglish : tr.switchToRussian,
+            onPressed: () => localeProvider.toggleLocale(context),
+            icon: Text(
+              isRussian ? '🇷🇺' : '🇬🇧',
+              style: const TextStyle(fontSize: 24),
+            ),
+            tooltip: isRussian
+                ? t('switchToEnglish')
+                : t('switchToRussian'),
           ),
           IconButton(
             onPressed: widget.onToggleTheme,
@@ -116,15 +126,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 CustomInput(
                   controller: _nameController,
-                  label     : tr.name,
-                  hintText  : tr.enterName,
+                  label     : t('name'),
+                  hintText  : t('enterName'),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
 
                 CustomInput(
                   controller   : _emailController,
-                  label        : tr.email,
-                  hintText     : tr.enterEmail,
+                  label        : t('email'),
+                  hintText     : t('enterEmail'),
                   keyboardType : TextInputType.emailAddress,
                   prefixIcon   : const Icon(Icons.email),
                 ),
@@ -132,8 +142,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 CustomInput(
                   controller   : _phoneController,
-                  label        : tr.phone,
-                  hintText     : tr.enterPhone,
+                  label        : t('phone'),
+                  hintText     : t('enterPhone'),
                   keyboardType : TextInputType.phone,
                   prefixIcon   : const Icon(Icons.phone),
                 ),
@@ -141,27 +151,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 CustomInput(
                   controller  : _passwordController,
-                  label       : tr.password,
-                  hintText    : tr.createPassword,
+                  label       : t('password'),
+                  hintText    : t('createPassword'),
                   obscureText : true,
                   prefixIcon  : const Icon(Icons.lock),
                 ),
                 const SizedBox(height: AppSizes.spacingS),
 
                 Text(
-                  tr.passwordRequirements,
+                  t('passwordRequirements'),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 13, color: fadedTextColor),
                 ),
                 const SizedBox(height: AppSizes.spacingL),
 
                 if (_error != null) ...[
-                  Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.redAccent)),
+                  Text(
+                    _error!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
                   const SizedBox(height: AppSizes.spacingS),
                 ],
 
                 PrimaryButton(
-                  text     : tr.register,
+                  text     : t('register'),
                   onPressed: () {
                     if (!_isLoading) _register();
                   },
@@ -181,7 +195,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     );
                   },
-                  child: Text(tr.alreadyHaveAccount, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.w500)),
+                  child: Text(
+                    t('alreadyHaveAccount'),
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
