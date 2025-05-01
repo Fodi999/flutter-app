@@ -1,29 +1,35 @@
 // lib/components/language_switcher.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../theme/locale_provider.dart';
+import '../theme/translator.dart';
 
-class LanguageSwitcher extends StatelessWidget {
+class LanguageSwitcher extends StatefulWidget {
   const LanguageSwitcher({super.key});
 
   @override
+  State<LanguageSwitcher> createState() => _LanguageSwitcherState();
+}
+
+class _LanguageSwitcherState extends State<LanguageSwitcher> {
+  void _toggleLanguage() {
+    setState(() {
+      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final localeProvider = context.watch<LocaleProvider>();
-    final isRussian = localeProvider.localeCode == 'ru';
+    final isRussian = currentLanguage == 'ru';
 
     return IconButton(
-      onPressed: () => localeProvider.toggleLocale(context),
+      onPressed: _toggleLanguage,
       icon: Text(
-        // Показываем флаг текущей локали
         isRussian ? '🇷🇺' : '🇬🇧',
         style: const TextStyle(fontSize: 24),
       ),
-      // Подсказка для кнопки — переключает на противоположный язык
-      tooltip: isRussian
-          ? 'Switch to English'
-          : 'Переключить на русский',
+      tooltip: isRussian ? t('switchToEnglish') : t('switchToRussian'),
     );
   }
 }
+
 

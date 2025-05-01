@@ -2,12 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 
 import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/components/app_title.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
-import 'package:sushi_app/theme/locale_provider.dart';
+import 'package:sushi_app/theme/translator.dart';
 import 'package:sushi_app/utils/responsive.dart';
 
 import 'register_screen.dart';
@@ -52,6 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ),
       );
     });
+
     _fadeAnimations = List.generate(3, (index) {
       return Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(
@@ -68,12 +68,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.dispose();
   }
 
+  void _toggleLanguage() {
+    setState(() {
+      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final t = translate;                             // shorthand
-    final localeProvider = context.watch<LocaleProvider>();
-    final isRu = localeProvider.localeCode == 'ru';
-
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final isDesktop = Responsive.isDesktop(context);
@@ -86,12 +88,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () => localeProvider.toggleLocale(context),
+            onPressed: _toggleLanguage,
             icon: Text(
-              isRu ? '🇷🇺' : '🇬🇧',
+              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: isRu ? t('switchToEnglish') : t('switchToRussian'),
+            tooltip: currentLanguage == 'ru' ? t('switchToEnglish') : t('switchToRussian'),
           ),
           IconButton(
             onPressed: widget.onToggleTheme,
@@ -236,6 +238,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
 
 
 

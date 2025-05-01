@@ -1,8 +1,6 @@
 // lib/screens/user/login_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 
 // widgets
 import 'package:sushi_app/components/custom_input.dart';
@@ -19,7 +17,7 @@ import 'package:sushi_app/screens/user/profile_screen.dart';
 
 // theme
 import 'package:sushi_app/theme/app_spacing.dart';
-import 'package:sushi_app/theme/locale_provider.dart';
+import 'package:sushi_app/theme/translator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -41,6 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _loading = false;
   String? _error;
+
+  void _toggleLanguage() {
+    setState(() {
+      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
+    });
+  }
 
   Future<void> _handleLogin() async {
     setState(() {
@@ -100,15 +104,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // функция перевода
-    final t = translate;
-
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final dt = theme.textTheme;
-
-    final localeProvider = context.watch<LocaleProvider>();
-    final isRu = localeProvider.localeCode == 'ru';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -119,14 +117,14 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           // Переключатель языка
           IconButton(
-            onPressed: () => localeProvider.toggleLocale(context),
+            onPressed: _toggleLanguage,
             icon: Text(
-              isRu ? '🇷🇺' : '🇬🇧',
+              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: isRu
-                ? 'Switch to English'
-                : 'Переключить на русский',
+            tooltip: currentLanguage == 'ru'
+                ? t('switchToEnglish')
+                : t('switchToRussian'),
           ),
           // Переключатель темы
           IconButton(
@@ -208,4 +206,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 

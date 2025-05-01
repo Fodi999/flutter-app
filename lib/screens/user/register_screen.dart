@@ -1,8 +1,6 @@
 // lib/screens/user/register_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 
 import 'package:sushi_app/components/custom_input.dart';
 import 'package:sushi_app/components/primary_button.dart';
@@ -10,7 +8,7 @@ import 'package:sushi_app/screens/user/login_screen.dart';
 import 'package:sushi_app/screens/user/profile_screen.dart';
 import 'package:sushi_app/services/auth_service.dart';
 import 'package:sushi_app/theme/app_sizes.dart';
-import 'package:sushi_app/theme/locale_provider.dart';
+import 'package:sushi_app/theme/translator.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({
@@ -27,15 +25,19 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // Controllers
   final _nameController     = TextEditingController();
   final _emailController    = TextEditingController();
   final _phoneController    = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // State
   bool   _isLoading = false;
   String? _error;
+
+  void _toggleLanguage() {
+    setState(() {
+      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
+    });
+  }
 
   Future<void> _register() async {
     setState(() {
@@ -75,15 +77,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // shorthand for translate
-    final t = translate;
-
     final theme          = Theme.of(context);
     final textColor      = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final fadedTextColor = textColor.withOpacity(0.6);
-
-    final localeProvider = context.watch<LocaleProvider>();
-    final isRussian      = localeProvider.localeCode == 'ru';
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -94,12 +90,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () => localeProvider.toggleLocale(context),
+            onPressed: _toggleLanguage,
             icon: Text(
-              isRussian ? '🇷🇺' : '🇬🇧',
+              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: isRussian
+            tooltip: currentLanguage == 'ru'
                 ? t('switchToEnglish')
                 : t('switchToRussian'),
           ),
@@ -117,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSizes.paddingXL,
-              vertical:   AppSizes.paddingL,
+              vertical: AppSizes.paddingL,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -183,6 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 const SizedBox(height: AppSizes.spacingL),
+
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -211,6 +208,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
 
 
 
