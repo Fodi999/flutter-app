@@ -8,9 +8,7 @@ import 'text_styles.dart';
 
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  // фон всего скрина
   scaffoldBackgroundColor: AppColors.backgroundDark,
-  // используем const-конструктор и убираем deprecated background/onBackground
   colorScheme: const ColorScheme.dark(
     primary: AppColors.primary,
     secondary: AppColors.secondary,
@@ -36,17 +34,17 @@ final ThemeData darkTheme = ThemeData(
     elevation: 0,
     iconTheme: IconThemeData(color: Colors.white),
     titleTextStyle: TextStyle(
-      fontFamily: 'YourFontFamily', // если нужно, или замените на AppTextStyles.displayLarge.copyWith(...)
+      fontFamily: 'YourFontFamily',
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: AppColors.primary,
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: const CardThemeData(
     color: AppColors.surfaceDark,
     elevation: 2,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
+      borderRadius: BorderRadius.all(Radius.circular(AppSizes.radius)),
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -64,6 +62,7 @@ final ThemeData darkTheme = ThemeData(
   ),
   useMaterial3: true,
 );
+
 
 
 

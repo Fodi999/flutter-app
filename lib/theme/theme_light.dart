@@ -6,11 +6,8 @@ import 'app_sizes.dart';
 import 'app_spacing.dart';
 import 'text_styles.dart';
 
-/// Светлая тема приложения
 final ThemeData lightTheme = ThemeData(
   useMaterial3: true,
-
-  // Цветовая схема на основе seedColor
   colorScheme: ColorScheme.fromSeed(
     seedColor: AppColors.primary,
     brightness: Brightness.light,
@@ -23,11 +20,7 @@ final ThemeData lightTheme = ThemeData(
     error: AppColors.error,
     onError: Colors.white,
   ),
-
-  // Фоновый цвет Scaffold
   scaffoldBackgroundColor: AppColors.backgroundLight,
-
-  // Типографика
   textTheme: const TextTheme(
     displayLarge: AppTextStyles.displayLarge,
     headlineLarge: AppTextStyles.headlineLarge,
@@ -38,30 +31,24 @@ final ThemeData lightTheme = ThemeData(
     bodyColor: AppColors.textPrimaryLight,
     displayColor: AppColors.textPrimaryLight,
   ),
-
-  // AppBar
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
     iconTheme: IconThemeData(color: AppColors.primary),
     titleTextStyle: TextStyle(
-      fontFamily: 'Roboto', // или ваш шрифт
+      fontFamily: 'Roboto',
       fontSize: 22,
       fontWeight: FontWeight.bold,
       color: AppColors.primary,
     ),
   ),
-
-  // Карточки
-  cardTheme: CardTheme(
+  cardTheme: const CardThemeData(
     color: AppColors.surfaceLight,
     elevation: 2,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radius),
+      borderRadius: BorderRadius.all(Radius.circular(AppSizes.radius)),
     ),
   ),
-
-  // Стилизация ElevatedButton
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.primary,
