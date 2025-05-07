@@ -16,7 +16,6 @@ import 'components/dashboard/form/menu_card.dart';
 import 'components/dashboard/form/ingredient_picker.dart';
 
 class ManageMenuItemsScreen extends StatefulWidget {
-  // 1️⃣ Конструктор сразу после заголовка класса, с super-parameter
   const ManageMenuItemsScreen({
     super.key,
     required this.token,
@@ -24,7 +23,6 @@ class ManageMenuItemsScreen extends StatefulWidget {
     required this.categoryName,
   });
 
-  // 2️⃣ Затем — поля
   final String token;
   final String categoryId;
   final String categoryName;
@@ -35,9 +33,11 @@ class ManageMenuItemsScreen extends StatefulWidget {
 
 class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
   late Future<List<MenuItem>> _menuFuture;
+  final ScrollController _scrollController = ScrollController();
   List<InventoryItem> inventory = [];
   List<Ingredient> ingredients = [];
 
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
   final _imageController = TextEditingController();
@@ -56,12 +56,11 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
   }
 
   void _loadMenuItems() {
-    _menuFuture = MenuService.getMenuWithCategory(widget.token); // 🛠 исправлено
+    _menuFuture = MenuService.getMenuWithCategory(widget.token);
   }
 
   Future<void> _loadInventory() async {
-  final inv = await InventoryService.getInventoryItems(widget.token);
-
+    final inv = await InventoryService.getInventoryItems(widget.token);
     setState(() => inventory = inv);
   }
 
@@ -88,6 +87,7 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
       {String? name, int? grams, double? waste}) {
     if (index < 0 || index >= ingredients.length) return;
     final selectedName = name ?? ingredients[index].productName;
+
     final fallback = InventoryItem(
       id: '',
       name: '',
@@ -95,11 +95,15 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
       pricePerKg: 0,
       available: false,
       createdAt: DateTime.now(),
+      emoji: '',
+      category: 'прочее',
     );
+
     final match = inventory.firstWhere(
       (it) => it.name == selectedName,
       orElse: () => fallback,
     );
+
     if (match.name.isEmpty) return;
 
     final pricePerKg = match.pricePerKg;
@@ -121,7 +125,26 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
     });
   }
 
-  Future<void> _saveMenuItem() async {
+  Future<void> _startEditMenuItem(MenuItem m) async {
+    _nameController.text = m.name;
+    _descController.text = m.description;
+    _imageController.text = m.imageUrl;
+    _priceController.text = m.price.toStringAsFixed(2);
+    setState(() => ingredients = []);
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
+  }
+
+  Future<void> _saveDraft() async => _saveMenuItem(publish: false);
+
+  Future<void> _saveAndPublish() async => _saveMenuItem(publish: true);
+
+  Future<void> _saveMenuItem({required bool publish}) async {
+    if (!_formKey.currentState!.validate()) return;
+
     final name = _nameController.text.trim();
     final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
     final outputWeight = _computedOutput.toDouble();
@@ -145,7 +168,7 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
       margin: price - cost,
       createdAt: DateTime.now(),
       categoryId: widget.categoryId,
-      published: false,
+      published: publish,
     );
 
     final calc = MenuCalculation(
@@ -160,7 +183,8 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
     try {
       await MenuService.createMenuItem(item, widget.token);
       await CalculationService.saveDishCalculation(calc, widget.token);
-      _showSnackBar('Блюдо и калькуляция сохранены');
+      _showSnackBar(
+          publish ? 'Блюдо опубликовано' : 'Блюдо сохранено как черновик');
       _clearForm();
       setState(_loadMenuItems);
     } catch (e) {
@@ -169,11 +193,12 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
   }
 
   void _clearForm() {
+    _formKey.currentState?.reset();
     _nameController.clear();
     _descController.clear();
     _imageController.clear();
     _priceController.clear();
-    ingredients.clear();
+    setState(() => ingredients.clear());
   }
 
   Future<void> _deleteMenuItem(String id) async {
@@ -188,6 +213,13 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
+    final isStepCompleted = _nameController.text.trim().isNotEmpty &&
+        price > 0 &&
+        _computedOutput > 0 &&
+        ingredients.isNotEmpty &&
+        ingredients.every((e) => e.productName.isNotEmpty);
+
     return Scaffold(
       appBar: AppBar(title: Text('Блюда — ${widget.categoryName}')),
       body: Padding(
@@ -207,10 +239,12 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
                 .toList();
 
             return SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   MenuItemForm(
+                    formKey: _formKey,
                     nameController: _nameController,
                     descController: _descController,
                     imageController: _imageController,
@@ -225,9 +259,7 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
                         context: context,
                         inventory: inventory,
                       );
-                      if (picked != null) {
-                        _updateIngredient(i, name: picked.name);
-                      }
+                      if (picked != null) _updateIngredient(i, name: picked.name);
                     },
                     onUpdateGrams: (i, g) => _updateIngredient(i, grams: g),
                     onUpdateWaste: (i, w) => _updateIngredient(i, waste: w),
@@ -237,34 +269,37 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
                   CalculationPanel(
                     cost: _computedCost,
                     output: _computedOutput,
-                    onSave: _saveMenuItem,
+                    price: price,
+                    onSaveDraft: _saveDraft,
+                    onSaveAndPublish: _saveAndPublish,
                     onClear: _clearForm,
+                    isStepCompleted: isStepCompleted,
                   ),
                   const Divider(height: 32),
-                  const Text('Список блюд',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Список блюд',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 16,
                     runSpacing: 16,
-                    children: items
-                        .map((m) => MenuCard(
-                              item: m,
-                              onDelete: () => _deleteMenuItem(m.id),
-                              onPublish: () async {
-                                try {
-                                  await MenuService.publishMenuItem(
-                                      m.id, widget.token);
-                                  _showSnackBar('Статус публикации изменён');
-                                  setState(_loadMenuItems);
-                                } catch (e) {
-                                  _showSnackBar(
-                                      'Ошибка публикации: $e', error: true);
-                                }
-                              },
-                            ))
-                        .toList(),
+                    children: items.map((m) {
+                      return MenuCard(
+                        item: m,
+                        onDelete: () => _deleteMenuItem(m.id),
+                        onPublish: () async {
+                          try {
+                            await MenuService.publishMenuItem(m.id, widget.token);
+                            _showSnackBar('Статус публикации изменён');
+                            setState(_loadMenuItems);
+                          } catch (e) {
+                            _showSnackBar('Ошибка публикации: $e', error: true);
+                          }
+                        },
+                        onEdit: () => _startEditMenuItem(m),
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
@@ -275,6 +310,12 @@ class _ManageMenuItemsScreenState extends State<ManageMenuItemsScreen> {
     );
   }
 }
+
+
+
+
+
+
 
 
 

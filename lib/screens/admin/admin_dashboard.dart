@@ -1,36 +1,35 @@
+// lib/screens/admin/admin_dashboard.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/theme/theme_provider.dart';
 import 'package:sushi_app/services/menu_service.dart';
 
-import 'package:sushi_app/screens/admin/controllers/admin_dashboard_controller.dart';
-import 'package:sushi_app/screens/admin/manage_users.dart';
-import 'package:sushi_app/screens/admin/manage_categories.dart';
-import 'package:sushi_app/screens/admin/manage_inventory.dart';
+import 'controllers/admin_dashboard_controller.dart';
+import 'manage_users.dart';
+import 'manage_categories.dart';
+import 'manage_inventory.dart';
 
-import 'package:sushi_app/screens/admin/components/dashboard/sidebar_item.dart';
-import 'package:sushi_app/screens/admin/components/dashboard/dashboard_card.dart';
-import 'package:sushi_app/screens/admin/components/dashboard/staff_list.dart';
+import 'components/dashboard/sidebar_item.dart';
+import 'components/dashboard/dashboard_card.dart';
+import 'components/dashboard/staff_list.dart';
 
-class AdminDashboard extends StatefulWidget {
-  // 1. Конструктор сразу после заголовка класса
+class AdminDashboard extends ConsumerStatefulWidget {
   const AdminDashboard({
     super.key,
     required this.user,
     required this.token,
   });
 
-  // 2. Затем — поля
   final User user;
   final String token;
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  ConsumerState<AdminDashboard> createState() => _AdminDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard>
+class _AdminDashboardState extends ConsumerState<AdminDashboard>
     with SingleTickerProviderStateMixin {
   String currentPage = 'dashboard';
   bool isSidebarOpen = true;
@@ -51,10 +50,8 @@ class _AdminDashboardState extends State<AdminDashboard>
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
+    _fadeAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
     _loadDashboardData();
   }
@@ -68,10 +65,9 @@ class _AdminDashboardState extends State<AdminDashboard>
   Future<void> _loadDashboardData() async {
     final result =
         await AdminDashboardController.fetchUserStats(widget.token);
-    final menuItems =
-        await MenuService.getMenuWithCategory(widget.token);
+    final menuItems = await MenuService.getMenuWithCategory(widget.token);
 
-    if (result != null) {
+    if (result != null && mounted) {
       final counts = <String, int>{};
       for (var item in menuItems) {
         final name = item.categoryName ?? 'Без категории';
@@ -79,14 +75,15 @@ class _AdminDashboardState extends State<AdminDashboard>
       }
       setState(() {
         userCount = result['userCount'] as int;
-        staff = List<User>.from(result['staff'] as List);
+        staff      = List<User>.from(result['staff'] as List);
         staffCount = result['staffCount'] as int;
-        menuItemCount = menuItems.length;
+        menuItemCount  = menuItems.length;
         categoryCounts = counts;
       });
     }
   }
 
+  /* ---------------- контент по вкладкам ---------------- */
   Widget _buildContent() {
     switch (currentPage) {
       case 'users':
@@ -105,6 +102,7 @@ class _AdminDashboardState extends State<AdminDashboard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                /* верхние карточки */
                 Row(
                   children: [
                     Flexible(
@@ -177,12 +175,13 @@ class _AdminDashboardState extends State<AdminDashboard>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark       = Theme.of(context).brightness == Brightness.dark;
+    final themeProv    = ref.watch(themeProvider);       // ← Riverpod
 
     return Scaffold(
       body: Row(
         children: [
+          /* ---------------------- sidebar ---------------------- */
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isSidebarOpen ? 240 : 72,
@@ -205,6 +204,7 @@ class _AdminDashboardState extends State<AdminDashboard>
                       setState(() => isSidebarOpen = !isSidebarOpen),
                 ),
                 const SizedBox(height: 16),
+                /* --- пункты меню --- */
                 SidebarItem(
                   icon: Icons.dashboard,
                   label: 'Панель',
@@ -275,6 +275,8 @@ class _AdminDashboardState extends State<AdminDashboard>
               ],
             ),
           ),
+
+          /* ------------------- основная область ------------------ */
           Expanded(
             child: Scaffold(
               appBar: AppBar(
@@ -282,13 +284,14 @@ class _AdminDashboardState extends State<AdminDashboard>
                 elevation: 0,
                 actions: [
                   IconButton(
+                    tooltip: 'Переключить тему',
                     icon: Icon(
-                      themeProvider.themeMode == ThemeMode.dark
+                      themeProv.themeMode == ThemeMode.dark
                           ? Icons.light_mode
                           : Icons.dark_mode,
                     ),
-                    onPressed: themeProvider.toggleTheme,
-                    tooltip: 'Переключить тему',
+                    onPressed: () =>
+                        ref.read(themeProvider).toggleTheme(),
                   ),
                 ],
               ),
@@ -301,6 +304,7 @@ class _AdminDashboardState extends State<AdminDashboard>
     );
   }
 }
+
 
 
 

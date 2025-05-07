@@ -1,5 +1,3 @@
-// lib/screens/user/register_screen.dart
-
 import 'package:flutter/material.dart';
 
 import 'package:sushi_app/components/custom_input.dart';
@@ -30,27 +28,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController    = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool   _isLoading = false;
+  bool _isLoading = false;
   String? _error;
 
-  void _toggleLanguage() {
-    setState(() {
-      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
-    });
+  Future<void> _toggleLanguage() async {
+    final langs = ['pl', 'en', 'ru'];
+    final index = langs.indexOf(currentLanguage);
+    final nextLang = langs[(index + 1) % langs.length];
+
+    await setLanguage(nextLang);
+    setState(() {});
   }
 
   Future<void> _register() async {
     setState(() {
       _isLoading = true;
-      _error     = null;
+      _error = null;
     });
 
     try {
       await AuthService.register(
-        name     : _nameController.text.trim(),
-        email    : _emailController.text.trim(),
-        phone    : _phoneController.text.trim(),
-        password : _passwordController.text,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        password: _passwordController.text,
       );
 
       final response = await AuthService.login(
@@ -64,7 +65,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         MaterialPageRoute(
           builder: (_) => ProfileScreen(
             userId: response['id'],
-            token : response['token'],
+            token: response['token'],
           ),
         ),
       );
@@ -77,9 +78,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme          = Theme.of(context);
-    final textColor      = theme.textTheme.bodyLarge?.color ?? Colors.white;
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final fadedTextColor = textColor.withOpacity(0.6);
+
+    final iconMap = {
+      'pl': '🇵🇱',
+      'en': '🇬🇧',
+      'ru': '🇷🇺',
+    };
+
+    final tooltipMap = {
+      'pl': t('switchToRussian'),
+      'en': t('switchToPolish'),
+      'ru': t('switchToEnglish'),
+    };
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -92,12 +105,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           IconButton(
             onPressed: _toggleLanguage,
             icon: Text(
-              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
+              iconMap[currentLanguage] ?? '🌐',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: currentLanguage == 'ru'
-                ? t('switchToEnglish')
-                : t('switchToRussian'),
+            tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
           ),
           IconButton(
             onPressed: widget.onToggleTheme,
@@ -122,35 +133,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 CustomInput(
                   controller: _nameController,
-                  label     : t('name'),
-                  hintText  : t('enterName'),
+                  label: t('name'),
+                  hintText: t('enterName'),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
 
                 CustomInput(
-                  controller   : _emailController,
-                  label        : t('email'),
-                  hintText     : t('enterEmail'),
-                  keyboardType : TextInputType.emailAddress,
-                  prefixIcon   : const Icon(Icons.email),
+                  controller: _emailController,
+                  label: t('email'),
+                  hintText: t('enterEmail'),
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: const Icon(Icons.email),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
 
                 CustomInput(
-                  controller   : _phoneController,
-                  label        : t('phone'),
-                  hintText     : t('enterPhone'),
-                  keyboardType : TextInputType.phone,
-                  prefixIcon   : const Icon(Icons.phone),
+                  controller: _phoneController,
+                  label: t('phone'),
+                  hintText: t('enterPhone'),
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: const Icon(Icons.phone),
                 ),
                 const SizedBox(height: AppSizes.spacingM),
 
                 CustomInput(
-                  controller  : _passwordController,
-                  label       : t('password'),
-                  hintText    : t('createPassword'),
-                  obscureText : true,
-                  prefixIcon  : const Icon(Icons.lock),
+                  controller: _passwordController,
+                  label: t('password'),
+                  hintText: t('createPassword'),
+                  obscureText: true,
+                  prefixIcon: const Icon(Icons.lock),
                 ),
                 const SizedBox(height: AppSizes.spacingS),
 
@@ -171,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
 
                 PrimaryButton(
-                  text     : t('register'),
+                  text: t('register'),
                   onPressed: () {
                     if (!_isLoading) _register();
                   },
@@ -186,7 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => LoginScreen(
-                          isDarkMode    : widget.isDarkMode,
+                          isDarkMode: widget.isDarkMode,
                           onToggleTheme: widget.onToggleTheme,
                         ),
                       ),
@@ -208,6 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
 
 
 

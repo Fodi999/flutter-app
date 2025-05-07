@@ -11,25 +11,41 @@ class LanguageSwitcher extends StatefulWidget {
 }
 
 class _LanguageSwitcherState extends State<LanguageSwitcher> {
+  final List<String> _languages = ['ru', 'en', 'pl'];
+
   void _toggleLanguage() {
+    final currentIndex = _languages.indexOf(currentLanguage);
+    final nextIndex = (currentIndex + 1) % _languages.length;
+
     setState(() {
-      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
+      currentLanguage = _languages[nextIndex];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isRussian = currentLanguage == 'ru';
+    final icon = {
+      'ru': '🇷🇺',
+      'en': '🇬🇧',
+      'pl': '🇵🇱',
+    }[currentLanguage]!;
+
+    final tooltip = {
+      'ru': t('switchToEnglish'),
+      'en': t('switchToPolish'),
+      'pl': t('switchToRussian'),
+    }[currentLanguage]!;
 
     return IconButton(
       onPressed: _toggleLanguage,
       icon: Text(
-        isRussian ? '🇷🇺' : '🇬🇧',
+        icon,
         style: const TextStyle(fontSize: 24),
       ),
-      tooltip: isRussian ? t('switchToEnglish') : t('switchToRussian'),
+      tooltip: tooltip,
     );
   }
 }
+
 
 

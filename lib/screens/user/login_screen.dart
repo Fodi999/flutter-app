@@ -1,5 +1,3 @@
-// lib/screens/user/login_screen.dart
-
 import 'package:flutter/material.dart';
 
 // widgets
@@ -40,10 +38,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   String? _error;
 
-  void _toggleLanguage() {
-    setState(() {
-      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
-    });
+  Future<void> _toggleLanguage() async {
+    final langs = ['pl', 'en', 'ru'];
+    final index = langs.indexOf(currentLanguage);
+    final nextLang = langs[(index + 1) % langs.length];
+
+    await setLanguage(nextLang);
+    setState(() {});
   }
 
   Future<void> _handleLogin() async {
@@ -108,6 +109,18 @@ class _LoginScreenState extends State<LoginScreen> {
     final cs = theme.colorScheme;
     final dt = theme.textTheme;
 
+    final iconMap = {
+      'pl': '🇵🇱',
+      'en': '🇬🇧',
+      'ru': '🇷🇺',
+    };
+
+    final tooltipMap = {
+      'pl': t('switchToRussian'),
+      'en': t('switchToPolish'),
+      'ru': t('switchToEnglish'),
+    };
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -115,18 +128,14 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         leading: BackButton(color: cs.primary),
         actions: [
-          // Переключатель языка
           IconButton(
             onPressed: _toggleLanguage,
             icon: Text(
-              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
+              iconMap[currentLanguage] ?? '🌐',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: currentLanguage == 'ru'
-                ? t('switchToEnglish')
-                : t('switchToRussian'),
+            tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
           ),
-          // Переключатель темы
           IconButton(
             onPressed: widget.onToggleTheme,
             icon: Icon(
@@ -146,7 +155,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Заголовок
                 Text(
                   t('login'),
                   textAlign: TextAlign.center,
@@ -160,7 +168,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.xl),
 
-                // Email
                 CustomInput(
                   controller: _email,
                   label: t('email'),
@@ -170,7 +177,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // Password
                 CustomInput(
                   controller: _pass,
                   label: t('password'),
@@ -180,7 +186,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Ошибка входа
                 if (_error != null) ...[
                   Text(
                     _error!,
@@ -190,7 +195,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.md),
                 ],
 
-                // Кнопка входа
                 PrimaryButton(
                   text: t('login'),
                   onPressed: () {
@@ -206,5 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 

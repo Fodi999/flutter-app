@@ -1,58 +1,263 @@
+// lib/screens/user/profile_screen.dart
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/models/menu_item.dart';
+import 'package:sushi_app/models/cart.dart';
+
 import 'package:sushi_app/services/user_service.dart';
 import 'package:sushi_app/services/menu_service.dart';
-import 'package:sushi_app/components/custom_card.dart';
+import 'package:sushi_app/services/cart_service.dart';
 
-// Наш компонент для карточки корзины
-import 'components/cart_item_card.dart';
+import 'package:sushi_app/state/cart_state.dart';
 
-import 'components/profile_header.dart';
-import 'components/editable_tabs.dart';
-import 'components/profile_info.dart';
-import 'components/grouped_menu.dart';
-import 'components/dish_autocomplete_input.dart';
+import 'package:sushi_app/widgets/profile_app_bar.dart';
+import 'package:sushi_app/widgets/profile_tips_dialog.dart';
+import 'package:sushi_app/widgets/user_and_menu_loader.dart';
+import 'package:sushi_app/widgets/profile_content.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.userId, required this.token});
+import 'components/cart_sidebar.dart';
+import 'components/cart_bottom_sheet.dart';
+import 'components/order_confirmation_screen.dart';
+
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({
+    super.key,
+    required this.userId,
+    required this.token,
+  });
 
   final String userId;
   final String token;
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with TickerProviderStateMixin {
+class _ProfileScreenState extends ConsumerState<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late final Future<User> _userFuture;
   late final Future<List<MenuItem>> _menuFuture;
   late final TabController _tabController;
-  late final ScrollController _scrollController;
+  final ScrollController _scrollController = ScrollController();
 
   bool _editMode = false;
   bool _isDark = false;
 
-  // Состояние корзины
-  final Map<MenuItem, int> _cart = {};
+  final _nameC = TextEditingController();
+  final _emailC = TextEditingController();
+  final _phoneC = TextEditingController();
+  final _addressC = TextEditingController();
+  final _bioC = TextEditingController();
+  final _birthdayC = TextEditingController();
 
-  // Контроллеры форм
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _bioController = TextEditingController();
-  final _birthdayController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
 
-  // Темы
+    // Загружаем профиль
+    _userFuture =
+        UserService.getUserById(widget.userId, widget.token).then((u) {
+      _nameC.text = u.name;
+      _emailC.text = u.email;
+      _phoneC.text = u.phone;
+      _addressC.text = u.address;
+      _bioC.text = u.bio;
+      _birthdayC.text = u.birthday;
+      return u;
+    });
+
+    // Загружаем меню
+    _menuFuture = MenuService.getMenuWithCategory(widget.token);
+
+    // Синхронизируем корзину
+    _loadCart();
+
+    // Показываем советы, если нужно
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => ProfileTipsDialog.showIfNeeded(context));
+  }
+
+  /// Загружает корзину с сервера и обновляет провайдер
+  Future<void> _loadCart() async {
+    final cart = await CartService.getCart(
+      userId: widget.userId,
+      token: widget.token,
+    );
+    ref.read(cartStateProvider.notifier).set(cart.items);
+  }
+
+  /// Добавляет товар и перезагружает корзину
+  Future<void> _addToCart(MenuItem item) async {
+    await CartService.addToCart(
+      userId: widget.userId,
+      token: widget.token,
+      menuItemId: item.id,
+      name: item.name,
+      quantity: 1,
+      price: item.price,
+    );
+    await _loadCart();
+  }
+
+  /// Увеличивает количество и перезагружает корзину
+  Future<void> _increase(CartItem ci) async {
+    await CartService.updateCartItem(
+      userId: widget.userId,
+      token: widget.token,
+      menuItemId: ci.menuItemId,
+      quantity: ci.quantity + 1,
+    );
+    await _loadCart();
+  }
+
+  /// Уменьшает количество (или удаляет) и перезагружает корзину
+  Future<void> _decrease(CartItem ci) async {
+    if (ci.quantity > 1) {
+      await CartService.updateCartItem(
+        userId: widget.userId,
+        token: widget.token,
+        menuItemId: ci.menuItemId,
+        quantity: ci.quantity - 1,
+      );
+    } else {
+      await CartService.removeCartItem(
+        userId: widget.userId,
+        token: widget.token,
+        menuItemId: ci.menuItemId,
+      );
+    }
+    await _loadCart();
+  }
+
+  /// Удаляет позицию и перезагружает корзину
+  Future<void> _remove(CartItem ci) async {
+    await CartService.removeCartItem(
+      userId: widget.userId,
+      token: widget.token,
+      menuItemId: ci.menuItemId,
+    );
+    await _loadCart();
+  }
+
+  /// Открывает CartSidebar или CartBottomSheet
+  void _openCart(User user) {
+    final items = ref.read(cartStateProvider);
+    if (items.isEmpty) return;
+
+    void _toConfirm(CartItem _, User u) {
+      final total = ref.read(cartStateProvider.notifier).totalSum;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OrderConfirmationScreen(
+  cartItems: List<CartItem>.from(items),
+  user: u,
+  token: widget.token,
+),
+        ),
+      );
+    }
+
+    final isWide = MediaQuery.of(context).size.width >= 800;
+    if (isWide) {
+      showDialog(
+        context: context,
+        builder: (_) => CartSidebar(
+          user: user,
+          onCheckout: _toConfirm,
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => CartBottomSheet(
+          user: user,
+          onCheckout: _toConfirm,
+        ),
+      );
+    }
+  }
+
+  /// Сохраняет профиль
+  Future<void> _saveProfile() async {
+    final data = {
+      'name': _nameC.text,
+      'email': _emailC.text,
+      'phone': _phoneC.text,
+      'address': _addressC.text,
+      'bio': _bioC.text,
+      'birthday': _birthdayC.text,
+    };
+    await UserService.updateUserById(widget.userId, data, widget.token);
+    if (mounted) {
+      setState(() => _editMode = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Профиль обновлён')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = _isDark ? _darkTheme : _lightTheme;
+    final cartQty =
+        ref.watch(cartStateProvider.select((s) => s.totalQty));
+
+    return Theme(
+      data: theme,
+      child: UserAndMenuLoader(
+        userFuture: _userFuture,
+        menuFuture: _menuFuture,
+        builder: (ctx, user, menu) {
+          final visibleMenu =
+              menu.where((m) => m.published).toList();
+          return Scaffold(
+            appBar: ProfileAppBar(
+              editMode: _editMode,
+              isDark: _isDark,
+              onToggleEdit: () =>
+                  setState(() => _editMode = !_editMode),
+              onToggleTheme: () =>
+                  setState(() => _isDark = !_isDark),
+              onLogout: () => Navigator.pop(context),
+              cartCount: cartQty,
+              onOpenCart: () => _openCart(user),
+            ),
+            body: ProfileContent(
+              user: user,
+              menu: visibleMenu,
+              editMode: _editMode,
+              isDark: _isDark,
+              tabController: _tabController,
+              scrollController: _scrollController,
+              nameController: _nameC,
+              emailController: _emailC,
+              phoneController: _phoneC,
+              addressController: _addressC,
+              bioController: _bioC,
+              birthdayController: _birthdayC,
+              onSaveProfile: _saveProfile,
+              onCancelEdit: () =>
+                  setState(() => _editMode = false),
+              onAddToCart: _addToCart,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   final ThemeData _lightTheme = ThemeData(
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xFFF7FAF7),
-    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
+    colorScheme:
+        ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
     cardColor: Colors.white.withOpacity(0.7),
   );
+
   final ThemeData _darkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: const Color(0xFF121212),
@@ -62,252 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     ),
     cardColor: Colors.grey[900]!.withOpacity(0.6),
   );
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _tabController = TabController(length: 2, vsync: this);
-
-    _userFuture =
-        UserService.getUserById(widget.userId, widget.token).then((user) {
-      _nameController.text = user.name;
-      _emailController.text = user.email;
-      _phoneController.text = user.phone;
-      _addressController.text = user.address;
-      _bioController.text = user.bio;
-      _birthdayController.text = user.birthday;
-      return user;
-    });
-
-    _menuFuture = MenuService.getMenuWithCategory(widget.token);
-    _showProfileTips();
-  }
-
-  Future<void> _showProfileTips() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool('profile_tips_shown') ?? false) && mounted) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Советы по управлению профилем'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('✏ Нажмите на ✎, чтобы редактировать профиль.'),
-              SizedBox(height: 8),
-              Text('🌙 Нажмите на 🌞 или 🌙, чтобы переключить тему.'),
-              SizedBox(height: 8),
-              Text('🚪 Нажмите на 🚪, чтобы выйти из аккаунта.'),
-              SizedBox(height: 8),
-              Divider(),
-              SizedBox(height: 8),
-              Text(
-                  '🏪 Хотите открыть свой бизнес онлайн? Смени профиль на бизнес-аккаунт!'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Понятно'),
-            ),
-          ],
-        ),
-      );
-      await prefs.setBool('profile_tips_shown', true);
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _tabController.dispose();
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    _bioController.dispose();
-    _birthdayController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _saveProfile() async {
-    final data = {
-      "name": _nameController.text,
-      "email": _emailController.text,
-      "phone": _phoneController.text,
-      "address": _addressController.text,
-      "bio": _bioController.text,
-      "birthday": _birthdayController.text,
-    };
-    await UserService.updateUserById(widget.userId, data, widget.token);
-    if (!mounted) return;
-    setState(() => _editMode = false);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Профиль обновлён')));
-  }
-
-  void _addToCart(MenuItem item) {
-    setState(() {
-      _cart.update(item, (q) => q + 1, ifAbsent: () => 1);
-    });
-  }
-
-  void _removeFromCart(MenuItem item) {
-    setState(() => _cart.remove(item));
-  }
-
-  void _changeQuantity(MenuItem item, int delta) {
-    setState(() {
-      final current = _cart[item] ?? 0;
-      final updated = (current + delta).clamp(0, 99);
-      if (updated > 0) _cart[item] = updated;
-      else _cart.remove(item);
-    });
-  }
-
-  void _scrollToCart() {
-    if (_cart.isEmpty) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOut,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = _isDark ? _darkTheme : _lightTheme;
-
-    return Theme(
-      data: theme,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Профиль'),
-          actions: [
-            IconButton(
-              onPressed: () => setState(() => _editMode = !_editMode),
-              icon: Icon(_editMode ? Icons.close : Icons.edit),
-            ),
-            IconButton(
-              onPressed: () => setState(() => _isDark = !_isDark),
-              icon: Icon(_isDark ? Icons.wb_sunny : Icons.nightlight),
-            ),
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.logout),
-            ),
-            // Просто иконка корзины с бэйджем
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                IconButton(
-                  onPressed: _scrollToCart,
-                  icon: const Icon(Icons.shopping_cart),
-                ),
-                if (_cart.isNotEmpty)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: CircleAvatar(
-                      radius: 8,
-                      backgroundColor: Colors.red,
-                      child: Text(
-                        '${_cart.values.fold<int>(0, (sum, q) => sum + q)}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        body: FutureBuilder<User>(
-          future: _userFuture,
-          builder: (context, snapUser) {
-            if (!snapUser.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final user = snapUser.data!;
-            return FutureBuilder<List<MenuItem>>(
-              future: _menuFuture,
-              builder: (context, snapMenu) {
-                final menu = snapMenu.data ?? [];
-                return SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      ProfileHeader(user: user, isDark: _isDark),
-                      const SizedBox(height: 20),
-                      DishAutocompleteInput(
-                        onSelected: (sel) => _addressController.text = sel,
-                      ),
-                      const SizedBox(height: 20),
-                      CustomCard(
-                        padding: const EdgeInsets.all(16),
-                        child: _editMode
-                            ? EditableTabs(
-                                tabController: _tabController,
-                                nameController: _nameController,
-                                bioController: _bioController,
-                                birthdayController: _birthdayController,
-                                emailController: _emailController,
-                                phoneController: _phoneController,
-                                addressController: _addressController,
-                                onSave: _saveProfile,
-                                onCancel: () =>
-                                    setState(() => _editMode = false),
-                              )
-                            : ProfileInfo(fields: {
-                                'Email': user.email,
-                                'Телефон': user.phone,
-                                'Адрес': user.address,
-                                'О себе': user.bio,
-                                'День рождения': user.birthday,
-                              }),
-                      ),
-                      if (!_editMode) GroupedMenu(
-                        items: menu,
-                        // передаём callback чтобы добавить в корзину
-                        onAddToCart: _addToCart,
-                      ),
-                      if (_cart.isNotEmpty) ...[
-                        const SizedBox(height: 24),
-                        Text('Ваша корзина',
-                            style: Theme.of(context).textTheme.titleMedium),
-                        const SizedBox(height: 12),
-                        for (var e in _cart.entries)
-                          CartItemCard(
-                            item: e.key,
-                            quantity: e.value,
-                            onRemove: () => _removeFromCart(e.key),
-                            onIncrease: () => _changeQuantity(e.key, 1),
-                            onDecrease: () => _changeQuantity(e.key, -1),
-                          ),
-                      ],
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
 }
-
-
 
 
 

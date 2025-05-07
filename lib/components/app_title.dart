@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppTitle extends StatelessWidget {
-  // 1. Конструктор – сразу после объявления класса
   const AppTitle({
     super.key,
     this.fontSize = 40,
     this.animate = true,
   });
 
-  // 2. Затем — поля
   final double fontSize;
   final bool animate;
 
@@ -34,15 +32,15 @@ class AppTitle extends StatelessWidget {
     final textStyle = theme.textTheme.displayLarge?.copyWith(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
-      letterSpacing: 1.5,
+      letterSpacing: 1.2,
       foreground: Paint()
         ..shader = gradient.createShader(
-          const Rect.fromLTWH(0, 0, 200, 70),
+          const Rect.fromLTWH(0, 0, 400, 70),
         ),
     );
 
     final child = Text(
-      'FISH IN HOUSE',
+      'SHOKU — mądre odżywianie, proste wybory',
       textAlign: TextAlign.center,
       style: textStyle,
     );
@@ -63,5 +61,6 @@ class AppTitle extends StatelessWidget {
         : child;
   }
 }
+
 
 

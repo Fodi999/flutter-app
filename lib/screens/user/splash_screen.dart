@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Transform.translate(
                         offset: _slideIn.value * 20,
                         child: Text(
-                          'Добро пожаловать на платформу\nвкусной и полезной кухни',
+                          'Witamy w SHOKU — miejscu, gdzie smak spotyka się z troską o zdrowie.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
@@ -121,7 +121,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Transform.translate(
                         offset: _slideIn.value * 20,
                         child: PrimaryButton(
-                          text: 'Продолжить',
+                          text: 'Dalej',
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,

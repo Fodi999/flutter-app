@@ -1,6 +1,5 @@
-
 class InventoryItem {
-  // 1️⃣ Сначала — конструкторы
+  // 1️⃣ Конструктор
   const InventoryItem({
     required this.id,
     required this.name,
@@ -9,8 +8,10 @@ class InventoryItem {
     required this.available,
     required this.createdAt,
     this.emoji,
+    required this.category,
   });
 
+  // 2️⃣ fromJson
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
     return InventoryItem(
       id: json['id'] as String? ?? '',
@@ -18,13 +19,13 @@ class InventoryItem {
       weightG: (json['weight_grams'] as num?)?.toDouble() ?? 0.0,
       pricePerKg: (json['price_per_kg'] as num?)?.toDouble() ?? 0.0,
       available: json['available'] as bool? ?? false,
-      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
-          DateTime.now(),
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
       emoji: json['emoji'] as String?,
+      category: json['category'] as String? ?? 'прочее',
     );
   }
 
-  // 2️⃣ Затем — поля
+  // 3️⃣ Поля
   final String id;
   final String name;
   final double weightG;
@@ -32,8 +33,9 @@ class InventoryItem {
   final bool available;
   final DateTime createdAt;
   final String? emoji;
+  final String category;
 
-  // 3️⃣ И только потом — вспомогательные методы
+  // 4️⃣ toJson
   Map<String, dynamic> toJson() {
     return {
       'product_name': name,
@@ -41,9 +43,11 @@ class InventoryItem {
       'price_per_kg': pricePerKg,
       'available': available,
       'emoji': emoji,
+      'category': category,
     };
   }
 }
+
 
 
 

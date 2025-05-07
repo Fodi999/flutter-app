@@ -1,14 +1,9 @@
-// lib/screens/user/welcome_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/components/app_title.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/theme/translator.dart';
 import 'package:sushi_app/utils/responsive.dart';
-
 import 'register_screen.dart';
 import 'login_screen.dart';
 
@@ -68,10 +63,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.dispose();
   }
 
-  void _toggleLanguage() {
-    setState(() {
-      currentLanguage = currentLanguage == 'ru' ? 'en' : 'ru';
-    });
+  Future<void> _toggleLanguage() async {
+    final langs = ['pl', 'en', 'ru'];
+    final index = langs.indexOf(currentLanguage);
+    final nextLang = langs[(index + 1) % langs.length];
+
+    await setLanguage(nextLang);
+    setState(() {});
   }
 
   @override
@@ -80,6 +78,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final isDesktop = Responsive.isDesktop(context);
     final maxWidth = isDesktop ? 600.0 : double.infinity;
+
+    final iconMap = {
+      'pl': '🇵🇱',
+      'en': '🇬🇧',
+      'ru': '🇷🇺',
+    };
+
+    final tooltipMap = {
+      'pl': t('switchToRussian'),
+      'en': t('switchToPolish'),
+      'ru': t('switchToEnglish'),
+    };
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -90,10 +100,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           IconButton(
             onPressed: _toggleLanguage,
             icon: Text(
-              currentLanguage == 'ru' ? '🇷🇺' : '🇬🇧',
+              iconMap[currentLanguage] ?? '🌐',
               style: const TextStyle(fontSize: 24),
             ),
-            tooltip: currentLanguage == 'ru' ? t('switchToEnglish') : t('switchToRussian'),
+            tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
           ),
           IconButton(
             onPressed: widget.onToggleTheme,
@@ -238,6 +248,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
+
 
 
 

@@ -1,55 +1,49 @@
 // lib/main.dart
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'theme/theme_light.dart';
 import 'theme/theme_dark.dart';
-import 'theme/theme_provider.dart';
+import 'theme/theme_provider.dart';           // ← ваш ChangeNotifier
 import 'screens/user/splash_screen.dart';
 
+/* ─────────── Riverpod-провайдер для темы ─────────── */
+final themeProvider =
+    ChangeNotifierProvider<ThemeProvider>((ref) => ThemeProvider());
+
+/* ─────────────────────── main() ───────────────────── */
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ],
-      child: const SushiApp(),
-    ),
+    const ProviderScope(child: SushiApp()),   // корневой Scope Riverpod
   );
 }
 
-class SushiApp extends StatefulWidget {
+/* ─────────────── Приложение ­­- ConsumerWidget ────── */
+class SushiApp extends ConsumerWidget {
   const SushiApp({super.key});
 
   @override
-  State<SushiApp> createState() => _SushiAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeProv = ref.watch(themeProvider);
 
-class _SushiAppState extends State<SushiApp> {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProv, _) {
-        return MaterialApp(
-          title: 'Sushi App',
-          debugShowCheckedModeBanner: false,
+    return MaterialApp(
+      title: 'Sushi App',
+      debugShowCheckedModeBanner: false,
 
-          // ─── Тема ───
-          themeMode: themeProv.themeMode,
-          theme: lightTheme,
-          darkTheme: darkTheme,
+      // ─── темы ───────────────────────────────────────
+      themeMode: themeProv.themeMode,
+      theme:     lightTheme,
+      darkTheme: darkTheme,
 
-          // ─── Стартовый экран ───
-          home: SplashScreen(
-            isDarkMode: themeProv.themeMode == ThemeMode.dark,
-            onToggleTheme: themeProv.toggleTheme,
-          ),
-        );
-      },
+      // ─── стартовый экран ────────────────────────────
+      home: SplashScreen(
+        isDarkMode: themeProv.themeMode == ThemeMode.dark,
+        onToggleTheme: () => ref.read(themeProvider).toggleTheme(),
+      ),
     );
   }
 }
+
 
 
 
