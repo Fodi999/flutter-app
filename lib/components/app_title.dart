@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sushi_app/theme/app_sizes.dart';
 
 class AppTitle extends StatelessWidget {
   const AppTitle({
@@ -17,16 +18,8 @@ class AppTitle extends StatelessWidget {
 
     final gradient = LinearGradient(
       colors: isDark
-          ? const [
-              Color(0xFFB9F6CA),
-              Color(0xFF69F0AE),
-              Color(0xFF00E676),
-            ]
-          : const [
-              Color(0xFF4CAF50),
-              Color(0xFF2E7D32),
-              Color(0xFF1B5E20),
-            ],
+          ? const [Color(0xFFB9F6CA), Color(0xFF69F0AE), Color(0xFF00E676)]
+          : const [Color(0xFF4CAF50), Color(0xFF2E7D32), Color(0xFF1B5E20)],
     );
 
     final textStyle = theme.textTheme.displayLarge?.copyWith(
@@ -39,10 +32,24 @@ class AppTitle extends StatelessWidget {
         ),
     );
 
-    final child = Text(
-      'SHOKU — mądre odżywianie, proste wybory',
-      textAlign: TextAlign.center,
-      style: textStyle,
+    final child = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipOval(
+          child: Image.network(
+            'https://i.postimg.cc/W1KV4b43/logo1.webp',
+            width: AppSizes.spacingXL * 2, // 32 * 4 = 128
+            height: AppSizes.spacingXL * 2,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(height: AppSizes.spacingL),
+      Text(
+  'SHOKU — mądre odżywianie, proste wybory',
+  textAlign: TextAlign.center,
+  style: textStyle?.copyWith(fontSize: fontSize),
+)
+      ],
     );
 
     return animate
@@ -61,6 +68,10 @@ class AppTitle extends StatelessWidget {
         : child;
   }
 }
+
+
+
+
 
 
 

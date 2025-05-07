@@ -93,119 +93,125 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: _toggleLanguage,
-            icon: Text(
-              iconMap[currentLanguage] ?? '🌐',
-              style: const TextStyle(fontSize: 24),
-            ),
-            tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
-          ),
-          IconButton(
-            onPressed: widget.onToggleTheme,
-            icon: Icon(
-              widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.xl,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
+          children: [
+            Positioned(
+              top: AppSpacing.md,
+              right: AppSpacing.md,
+              child: Row(
                 children: [
-                  const AppTitle(fontSize: 48, animate: true),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    t('slogan'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: textColor.withOpacity(0.85),
+                  IconButton(
+                    onPressed: _toggleLanguage,
+                    icon: Text(
+                      iconMap[currentLanguage] ?? '🌐',
+                      style: const TextStyle(fontSize: 24),
                     ),
+                    tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-
-                  for (int i = 0; i < 3; i++) ...[
-                    AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        late final IconData icon;
-                        late final String text;
-                        if (i == 0) {
-                          icon = Icons.check_circle;
-                          text = t('freshIngredients');
-                        } else if (i == 1) {
-                          icon = Icons.local_shipping;
-                          text = t('fastOrder');
-                        } else {
-                          icon = Icons.verified_user;
-                          text = t('qualitySafety');
-                        }
-                        return Opacity(
-                          opacity: _fadeAnimations[i].value,
-                          child: Transform.translate(
-                            offset: _slideAnimations[i].value * 20,
-                            child: _buildFeatureBox(context, icon, text),
-                          ),
-                        );
-                      },
+                  IconButton(
+                    onPressed: widget.onToggleTheme,
+                    icon: Icon(
+                      widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: PrimaryButton(
-                          text: t('login'),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => LoginScreen(
-                                isDarkMode: widget.isDarkMode,
-                                onToggleTheme: widget.onToggleTheme,
-                              ),
-                            ),
-                          ),
-                          color: theme.colorScheme.surface.withOpacity(0.05),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: PrimaryButton(
-                          text: t('register'),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => RegisterScreen(
-                                isDarkMode: widget.isDarkMode,
-                                onToggleTheme: widget.onToggleTheme,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          ),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.xl,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AppTitle(fontSize: 48, animate: true),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        t('slogan'),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: textColor.withOpacity(0.85),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+
+                      for (int i = 0; i < 3; i++) ...[
+                        AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            late final IconData icon;
+                            late final String text;
+                            if (i == 0) {
+                              icon = Icons.check_circle;
+                              text = t('freshIngredients');
+                            } else if (i == 1) {
+                              icon = Icons.local_shipping;
+                              text = t('fastOrder');
+                            } else {
+                              icon = Icons.verified_user;
+                              text = t('qualitySafety');
+                            }
+                            return Opacity(
+                              opacity: _fadeAnimations[i].value,
+                              child: Transform.translate(
+                                offset: _slideAnimations[i].value * 20,
+                                child: _buildFeatureBox(context, icon, text),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+
+                      const SizedBox(height: AppSpacing.lg),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: PrimaryButton(
+                              text: t('login'),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => LoginScreen(
+                                    isDarkMode: widget.isDarkMode,
+                                    onToggleTheme: widget.onToggleTheme,
+                                  ),
+                                ),
+                              ),
+                              color: theme.colorScheme.surface.withOpacity(0.05),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: PrimaryButton(
+                              text: t('register'),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RegisterScreen(
+                                    isDarkMode: widget.isDarkMode,
+                                    onToggleTheme: widget.onToggleTheme,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -248,6 +254,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
 
 
 

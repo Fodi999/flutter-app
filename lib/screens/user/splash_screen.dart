@@ -4,7 +4,6 @@ import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/screens/user/welcome_screen.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/utils/responsive.dart';
-import 'package:sushi_app/theme/animated_fade_in.dart';
 
 class SplashScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -54,7 +53,6 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.white;
     final isDesktop = Responsive.isDesktop(context);
     final horizontalPadding = isDesktop ? AppSpacing.xl : AppSpacing.lg;
 
@@ -68,21 +66,6 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) => Opacity(
-                      opacity: _fadeIn.value,
-                      child: Transform.translate(
-                        offset: _slideIn.value * 20,
-                        child: Icon(
-                          Icons.ramen_dining_rounded,
-                          size: 80,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
                   AnimatedBuilder(
                     animation: _controller,
                     builder: (context, child) => Opacity(
@@ -106,8 +89,7 @@ class _SplashScreenState extends State<SplashScreen>
                           style: TextStyle(
                             fontSize: 20,
                             height: 1.4,
-                            color: colorScheme.onPrimary
-                                .withOpacity(0.8),
+                            color: colorScheme.onPrimary.withOpacity(0.8),
                           ),
                         ),
                       ),
@@ -147,6 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
 
 
 
