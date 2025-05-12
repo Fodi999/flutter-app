@@ -1,5 +1,3 @@
-// lib/screens/user/components/cart_bottom_sheet.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sushi_app/models/cart.dart';
@@ -7,7 +5,6 @@ import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/state/cart_state.dart';
 import 'cart_item_card.dart';
 
-/// Bottom Sheet для мобильной версии
 class CartBottomSheet extends ConsumerWidget {
   const CartBottomSheet({
     Key? key,
@@ -21,6 +18,8 @@ class CartBottomSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final dt = Theme.of(context).textTheme;
+
     final items = ref.watch(cartStateProvider);
     final totalItems = items.fold<int>(0, (s, e) => s + e.quantity);
     final totalPrice = items.fold<double>(0, (s, e) => s + e.quantity * e.price);
@@ -36,12 +35,13 @@ class CartBottomSheet extends ConsumerWidget {
             Align(
               alignment: Alignment.topRight,
               child: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop()),
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
             ),
-            Text('Ваша корзина',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text('Ваша корзина', style: dt.titleLarge),
             const SizedBox(height: 12),
+
             if (items.isNotEmpty)
               Flexible(
                 child: ListView.builder(
@@ -52,31 +52,30 @@ class CartBottomSheet extends ConsumerWidget {
                     item: items[i],
                     showControls: true,
                     showCheckout: false,
+                    user: user,
+                    onCheckout: onCheckout, // ✅
                   ),
                 ),
               )
             else
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Text('Корзина пуста',
-                    style: Theme.of(context).textTheme.bodyMedium),
+                child: Text('Корзина пуста', style: dt.bodyMedium),
               ),
-            const SizedBox(height: 12),
+
+            const Divider(height: 24),
+
+            /// 🧾 Кол-во и сумма
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Всего блюд:',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                    style: dt.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
                 Text('$totalItems',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: cs.primary)),
+                    style: dt.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: cs.primary,
+                    )),
               ],
             ),
             const SizedBox(height: 4),
@@ -84,20 +83,17 @@ class CartBottomSheet extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Сумма заказа:',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                    style: dt.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
                 Text('${totalPrice.toStringAsFixed(0)} ₽',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: cs.primary)),
+                    style: dt.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: cs.primary,
+                    )),
               ],
             ),
             const SizedBox(height: 12),
+
+            /// ✅ Оформить весь заказ
             FilledButton(
               onPressed: items.isEmpty || onCheckout == null
                   ? null
@@ -105,11 +101,14 @@ class CartBottomSheet extends ConsumerWidget {
                       for (final ci in items) {
                         onCheckout!(ci, user);
                       }
+                      ref.read(cartStateProvider.notifier).clear();
+                      Navigator.of(context).pop();
                     },
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               child: const Text('Оформить весь заказ'),
             ),
@@ -119,6 +118,8 @@ class CartBottomSheet extends ConsumerWidget {
     );
   }
 }
+
+
 
 
 

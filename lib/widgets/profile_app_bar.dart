@@ -1,32 +1,16 @@
-// lib/widgets/profile_app_bar.dart
-//
-// • Показывает количество товаров прямо из Riverpod-состояния корзины.
-// • Достаточно вызвать ProfileAppBar без передачи cartCount –
-//   число возьмётся из `cartStateProvider`.
-// • Прежний параметр cartCount оставлен (опц.) на случай,
-//
-//     ProfileAppBar(cartCount: fallbackQty, …)
-//
-//   но при наличии Riverpod-состояния он будет игнорироваться.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../state/cart_state.dart';      //  ←  provider корзины
-import 'cart_button.dart';
+import '../state/cart_state.dart';           // 🛒 Riverpod-провайдер корзины
+import '../utils/log_helper.dart';           // 🧾 Логгирование действий
+import 'cart_button.dart';                   // 🧩 Виджет кнопки корзины
 
-class ProfileAppBar extends ConsumerWidget
-    implements PreferredSizeWidget {
+class ProfileAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final bool editMode;
   final bool isDark;
   final VoidCallback onToggleEdit;
   final VoidCallback onToggleTheme;
   final VoidCallback onLogout;
-
-  /// Опционально (для обратной совместимости).  
-  /// Если не задан, берётся из cartStateProvider.
-  final int? cartCount;
-
   final VoidCallback onOpenCart;
 
   const ProfileAppBar({
@@ -37,7 +21,6 @@ class ProfileAppBar extends ConsumerWidget
     required this.onToggleTheme,
     required this.onLogout,
     required this.onOpenCart,
-    this.cartCount,
   });
 
   @override
@@ -45,35 +28,71 @@ class ProfileAppBar extends ConsumerWidget
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // qty из Riverpod-состояния; если null – используем переданный cartCount
     final qty = ref.watch(cartStateProvider).totalQty;
-    final displayQty = cartCount ?? qty;
 
     return AppBar(
+      elevation: 0,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
       title: const Text('Профиль'),
       actions: [
-        IconButton(
-          onPressed: onToggleEdit,
-          icon: Icon(editMode ? Icons.close : Icons.edit),
-          tooltip: editMode ? 'Отменить' : 'Редактировать профиль',
+        Tooltip(
+          message: editMode ? 'Отменить редактирование' : 'Редактировать профиль',
+          waitDuration: const Duration(milliseconds: 500),
+          child: IconButton(
+            icon: Icon(editMode ? Icons.close : Icons.edit),
+            onPressed: () {
+              logInfo(
+                editMode
+                    ? 'Отмена редактирования профиля'
+                    : 'Включено редактирование профиля',
+                tag: 'ProfileAppBar',
+              );
+              onToggleEdit();
+            },
+          ),
         ),
-        IconButton(
-          onPressed: onToggleTheme,
-          icon: Icon(isDark ? Icons.wb_sunny : Icons.nightlight),
-          tooltip: 'Переключить тему',
+        Tooltip(
+          message: 'Переключить тему',
+          waitDuration: const Duration(milliseconds: 500),
+          child: IconButton(
+            icon: Icon(isDark ? Icons.wb_sunny : Icons.nightlight),
+            onPressed: () {
+              logInfo(
+                'Смена темы: ${isDark ? 'на светлую' : 'на тёмную'}',
+                tag: 'ProfileAppBar',
+              );
+              onToggleTheme();
+            },
+          ),
         ),
-        IconButton(
-          onPressed: onLogout,
-          icon: const Icon(Icons.logout),
-          tooltip: 'Выйти',
+        Tooltip(
+          message: 'Выйти',
+          waitDuration: const Duration(milliseconds: 500),
+          child: IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              logWarning('Пользователь нажал выход из аккаунта', tag: 'ProfileAppBar');
+              onLogout();
+            },
+          ),
         ),
-        // Кнопка корзины
-        CartButton(
-          count: displayQty,
-          onPressed: onOpenCart,
+        Tooltip(
+          message: 'Открыть корзину',
+          waitDuration: const Duration(milliseconds: 500),
+          child: CartButton(
+           
+            onPressed: () {
+              logInfo('Открытие корзины (кол-во: $qty)', tag: 'ProfileAppBar');
+              onOpenCart();
+            },
+          ),
         ),
       ],
     );
   }
 }
+
+
+
 

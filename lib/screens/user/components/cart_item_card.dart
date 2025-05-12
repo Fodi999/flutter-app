@@ -1,7 +1,5 @@
-// lib/screens/user/components/cart_item_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:sushi_app/models/cart.dart';
 import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/state/cart_state.dart';
@@ -16,29 +14,18 @@ class CartItemCard extends ConsumerWidget {
     this.onCheckout,
   });
 
-  /// Позиция корзины
   final CartItem item;
-
-  /// Показывать ли + / – / удалить
   final bool showControls;
-
-  /// Показывать ли кнопку «Оформить»
   final bool showCheckout;
-
-  /// Текущий пользователь (нужен для onCheckout)
   final User? user;
-
-  /// Колбэк «Оформить позицию» (если нужен)
   final void Function(CartItem item, User user)? onCheckout;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final dt = Theme.of(context).textTheme;
-    final totalPrice = (item.price * item.quantity).toStringAsFixed(0);
-
-    /* удобные ссылки на провайдер */
     final cart = ref.read(cartStateProvider.notifier);
+    final total = (item.price * item.quantity).toStringAsFixed(0);
 
     return Column(
       children: [
@@ -61,7 +48,7 @@ class CartItemCard extends ConsumerWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                /* ───── картинка ───── */
+                /// 🖼 Изображение
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
@@ -79,7 +66,7 @@ class CartItemCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 16),
 
-                /* ───── название и цены ───── */
+                /// 🧾 Основная информация
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,14 +81,23 @@ class CartItemCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
+
+                      if (item.options.isNotEmpty)
+                        ...item.options.entries.map((entry) => Text(
+                              '${entry.key}: ${entry.value}',
+                              style: dt.bodySmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                              ),
+                            )),
+
+                      const SizedBox(height: 4),
                       Text(
                         '${item.price.toStringAsFixed(0)} ₽ / шт.',
-                        style:
-                            dt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        style: dt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Итого: $totalPrice ₽',
+                        'Итого: $total ₽',
                         style: dt.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: cs.primary,
@@ -111,47 +107,46 @@ class CartItemCard extends ConsumerWidget {
                   ),
                 ),
 
-                /* ───── управление количеством ───── */
+                /// ➕➖ Управление количеством
                 if (showControls)
                   Column(
                     children: [
                       IconButton(
-                        onPressed: () => cart.inc(item),
                         icon: const Icon(Icons.add_circle),
                         color: cs.primary,
-                        padding: EdgeInsets.zero,
                         visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        onPressed: () => cart.inc(item),
                       ),
                       Text(
                         '${item.quantity}',
-                        style: dt.labelLarge
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: dt.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        onPressed: () => cart.dec(item),
                         icon: const Icon(Icons.remove_circle),
                         color: cs.primary,
-                        padding: EdgeInsets.zero,
                         visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        onPressed: () => cart.dec(item),
                       ),
                     ],
                   ),
 
-                /* ───── удалить ───── */
+                /// ❌ Удаление
                 if (showControls)
                   IconButton(
-                    onPressed: () => cart.remove(item),
                     icon: const Icon(Icons.close_rounded),
                     color: cs.error,
                     padding: EdgeInsets.zero,
+                    onPressed: () => cart.remove(item),
                   ),
               ],
             ),
           ),
         ),
 
-        /* ───── оформить позицию ───── */
-        if (showCheckout && onCheckout != null && user != null)
+        /// 🧾 Кнопка "Оформить" под карточкой
+        if (showCheckout && user != null && onCheckout != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: FilledButton.icon(
@@ -170,6 +165,8 @@ class CartItemCard extends ConsumerWidget {
     );
   }
 }
+
+
 
 
 

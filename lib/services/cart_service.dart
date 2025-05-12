@@ -30,6 +30,7 @@ class CartService {
     required String name,
     required int quantity,
     required double price,
+    Map<String, dynamic> options = const {}, // 🆕
   }) async {
     final url = '$baseUrl/users/$userId/cart/';
     final body = {
@@ -37,6 +38,7 @@ class CartService {
       'name': name,
       'quantity': quantity,
       'price': price,
+      'options': options, 
     };
     final response = await postRequest(
       url,

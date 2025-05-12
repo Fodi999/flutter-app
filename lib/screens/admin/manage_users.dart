@@ -3,12 +3,10 @@ import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/services/user_service.dart';
 import 'components/dashboard/email_search_field.dart';
 import 'components/user/user_card.dart';
+import 'manage_orders_screen.dart'; // 👈 импорт экрана заказов
 
 class ManageUsersScreen extends StatefulWidget {
-  // 1️⃣ Конструктор сразу после объявления класса
   const ManageUsersScreen({super.key, required this.token});
-
-  // 2️⃣ Поле
   final String token;
 
   @override
@@ -45,9 +43,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         _allUsers = users;
         _filteredUsers = users;
       });
-    } catch (_) {
-      // Ошибку здесь можно залогировать, если нужно
-    }
+    } catch (_) {}
   }
 
   Future<void> _deleteUser(String id) async {
@@ -100,6 +96,21 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
+        title: const Text('Пользователи'),
+        actions: [
+          IconButton(
+            tooltip: 'Перейти к заказам',
+            icon: const Icon(Icons.receipt_long),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ManageOrdersScreen(token: widget.token),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<List<User>>(
         future: _usersFuture,
@@ -110,7 +121,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           if (snapshot.hasError) {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           }
-          // snapshot.data всегда не-null здесь, т.к. будущий список загружен
+
           return Column(
             children: [
               EmailSearchField(
@@ -139,4 +150,5 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 }
+
 

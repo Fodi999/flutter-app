@@ -14,6 +14,9 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
 
+  /// 🆕 Геттер, указывающий, активна ли тёмная тема
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
+
   /* ─── переключить тему ─── */
   Future<void> toggleTheme() async {
     _themeMode =
@@ -38,6 +41,7 @@ class ThemeProvider with ChangeNotifier {
     и пишите  ref.watch(themeProvider) / ref.read(themeProvider) */
 final themeProvider =
     ChangeNotifierProvider<ThemeProvider>((ref) => ThemeProvider());
+
 
 
 

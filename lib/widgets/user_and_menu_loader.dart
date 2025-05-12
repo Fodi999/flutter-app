@@ -1,8 +1,7 @@
-// lib/widgets/user_and_menu_loader.dart
-
 import 'package:flutter/material.dart';
 import 'package:sushi_app/models/user.dart';
 import 'package:sushi_app/models/menu_item.dart';
+import 'package:sushi_app/utils/log_helper.dart'; // ✅ подключение логгера
 
 /// Загружает пользователя и меню, и передаёт их в builder.
 /// Показывает CircularProgressIndicator, пока идёт загрузка,
@@ -10,8 +9,7 @@ import 'package:sushi_app/models/menu_item.dart';
 class UserAndMenuLoader extends StatelessWidget {
   final Future<User> userFuture;
   final Future<List<MenuItem>> menuFuture;
-  final Widget Function(BuildContext context, User user, List<MenuItem> menu)
-      builder;
+  final Widget Function(BuildContext context, User user, List<MenuItem> menu) builder;
 
   const UserAndMenuLoader({
     Key? key,
@@ -29,9 +27,13 @@ class UserAndMenuLoader extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapUser.hasError || !snapUser.hasData) {
+          logError('Ошибка загрузки пользователя: ${snapUser.error}', tag: 'UserAndMenuLoader');
           return Center(child: Text('Ошибка загрузки профиля: ${snapUser.error}'));
         }
+
         final user = snapUser.data!;
+        logInfo('✅ Пользователь загружен: ${user.email}', tag: 'UserAndMenuLoader');
+
         return FutureBuilder<List<MenuItem>>(
           future: menuFuture,
           builder: (ctx2, snapMenu) {
@@ -39,8 +41,11 @@ class UserAndMenuLoader extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapMenu.hasError || !snapMenu.hasData) {
+              logError('Ошибка загрузки меню: ${snapMenu.error}', tag: 'UserAndMenuLoader');
               return Center(child: Text('Ошибка загрузки меню: ${snapMenu.error}'));
             }
+
+            logInfo('✅ Меню успешно загружено. Кол-во: ${snapMenu.data!.length}', tag: 'UserAndMenuLoader');
             return builder(ctx2, user, snapMenu.data!);
           },
         );
@@ -48,3 +53,4 @@ class UserAndMenuLoader extends StatelessWidget {
     );
   }
 }
+

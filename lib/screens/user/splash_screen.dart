@@ -4,6 +4,7 @@ import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/screens/user/welcome_screen.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/utils/responsive.dart';
+import 'package:sushi_app/utils/log_helper.dart'; // ✅ импорт логгера
 
 class SplashScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -28,6 +29,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    logInfo('Инициализация SplashScreen', tag: 'SplashScreen'); // ✅ лог
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -46,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _controller.dispose();
+    logDebug('SplashScreen уничтожен', tag: 'SplashScreen'); // ✅ лог
     super.dispose();
   }
 
@@ -105,6 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: PrimaryButton(
                           text: 'Dalej',
                           onPressed: () {
+                            logInfo('Переход к WelcomeScreen', tag: 'SplashScreen'); // ✅ лог
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -129,6 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
 
 
 

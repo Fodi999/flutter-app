@@ -1,5 +1,3 @@
-// lib/models/cart.dart
-
 class Cart {
   final int id;
   final String userId;
@@ -12,23 +10,31 @@ class Cart {
   });
 
   factory Cart.fromJson(Map<String, dynamic> json) => Cart(
-        id: (json['ID'] as num).toInt(),
+        id: (json['ID'] ?? 0) as int,
         userId: json['userId'] as String,
-        items: (json['items'] as List<dynamic>?)
-                ?.map((e) => CartItem.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
+        items: (json['items'] as List<dynamic>? ?? [])
+            .map((e) => CartItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
+
+  Map<String, dynamic> toJson() => {
+        'ID': id,
+        'userId': userId,
+        'items': items.map((item) => item.toJson()).toList(),
+      };
 }
 
 class CartItem {
-  final int    id;
-  final int    cartId;
+  final int id;
+  final int cartId;
   final String menuItemId;
   final String name;
-  final int    quantity;
+  final int quantity;
   final double price;
   final String imageUrl;
+
+  /// Дополнительные параметры блюда (например, размер, добавки)
+  final Map<String, dynamic> options;
 
   CartItem({
     required this.id,
@@ -38,22 +44,26 @@ class CartItem {
     required this.quantity,
     required this.price,
     required this.imageUrl,
+    this.options = const {},
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
-        id:        (json['ID']      as num).toInt(),
-        cartId:    (json['CartID']  as num).toInt(),
-        menuItemId: json['menuItemId'] as String,
-        name:       json['name']       as String,
-        quantity:  (json['quantity'] as num).toInt(),
-        price:     (json['price']    as num).toDouble(),
-        imageUrl:   json['imageUrl'] as String? ?? '',
+        id: (json['ID'] ?? 0) as int,
+        cartId: (json['CartID'] ?? 0) as int,
+        menuItemId: json['menuItemId'] ?? '',
+        name: json['name'] as String? ?? '',
+        quantity: (json['quantity'] ?? 0) as int,
+        price: (json['price'] ?? 0).toDouble(),
+        imageUrl: json['imageUrl'] ?? '',
+        options: json['options'] != null && json['options'] is Map<String, dynamic>
+            ? Map<String, dynamic>.from(json['options'])
+            : {},
       );
 
-  /// Создаёт копию с изменёнными полями (по-умолчанию — без изменений).
   CartItem copyWith({
-    int?    quantity,
+    int? quantity,
     double? price,
+    Map<String, dynamic>? options,
   }) =>
       CartItem(
         id: id,
@@ -63,8 +73,22 @@ class CartItem {
         quantity: quantity ?? this.quantity,
         price: price ?? this.price,
         imageUrl: imageUrl,
+        options: options ?? this.options,
       );
+
+  Map<String, dynamic> toJson() => {
+        'ID': id,
+        'CartID': cartId,
+        'menuItemId': menuItemId,
+        'name': name,
+        'quantity': quantity,
+        'price': price,
+        'imageUrl': imageUrl,
+        'options': options,
+      };
 }
+
+
 
 
 

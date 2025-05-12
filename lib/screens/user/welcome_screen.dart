@@ -4,6 +4,7 @@ import 'package:sushi_app/components/app_title.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/theme/translator.dart';
 import 'package:sushi_app/utils/responsive.dart';
+import 'package:sushi_app/utils/log_helper.dart'; // ✅ логгер
 import 'register_screen.dart';
 import 'login_screen.dart';
 
@@ -30,6 +31,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
+    logInfo('WelcomeScreen инициализирован', tag: 'WelcomeScreen');
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -59,6 +62,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   void dispose() {
+    logDebug('WelcomeScreen уничтожен', tag: 'WelcomeScreen');
     _controller.dispose();
     super.dispose();
   }
@@ -67,6 +71,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     final langs = ['pl', 'en', 'ru'];
     final index = langs.indexOf(currentLanguage);
     final nextLang = langs[(index + 1) % langs.length];
+
+    logInfo('Смена языка: $currentLanguage → $nextLang', tag: 'WelcomeScreen');
 
     await setLanguage(nextLang);
     setState(() {});
@@ -110,7 +116,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     tooltip: tooltipMap[currentLanguage] ?? 'Switch language',
                   ),
                   IconButton(
-                    onPressed: widget.onToggleTheme,
+                    onPressed: () {
+                      logInfo('Тема переключена', tag: 'WelcomeScreen');
+                      widget.onToggleTheme();
+                    },
                     icon: Icon(
                       widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
                       color: theme.colorScheme.primary,
@@ -177,15 +186,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           Expanded(
                             child: PrimaryButton(
                               text: t('login'),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => LoginScreen(
-                                    isDarkMode: widget.isDarkMode,
-                                    onToggleTheme: widget.onToggleTheme,
+                              onPressed: () {
+                                logInfo('Переход на экран входа', tag: 'WelcomeScreen');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => LoginScreen(
+                                      isDarkMode: widget.isDarkMode,
+                                      onToggleTheme: widget.onToggleTheme,
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                               color: theme.colorScheme.surface.withOpacity(0.05),
                             ),
                           ),
@@ -193,15 +205,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           Expanded(
                             child: PrimaryButton(
                               text: t('register'),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => RegisterScreen(
-                                    isDarkMode: widget.isDarkMode,
-                                    onToggleTheme: widget.onToggleTheme,
+                              onPressed: () {
+                                logInfo('Переход на экран регистрации', tag: 'WelcomeScreen');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RegisterScreen(
+                                      isDarkMode: widget.isDarkMode,
+                                      onToggleTheme: widget.onToggleTheme,
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -254,6 +269,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
+
 
 
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:sushi_app/components/custom_input.dart';
 import 'package:sushi_app/components/primary_button.dart';
 import 'package:sushi_app/screens/user/login_screen.dart';
@@ -7,6 +6,7 @@ import 'package:sushi_app/screens/user/profile_screen.dart';
 import 'package:sushi_app/services/auth_service.dart';
 import 'package:sushi_app/theme/app_sizes.dart';
 import 'package:sushi_app/theme/translator.dart';
+import 'package:sushi_app/utils/log_helper.dart'; // ✅ Подключение логгера
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({
@@ -23,9 +23,9 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _nameController     = TextEditingController();
-  final _emailController    = TextEditingController();
-  final _phoneController    = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
@@ -46,6 +46,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _error = null;
     });
 
+    logInfo('👤 Начало регистрации', tag: 'RegisterScreen');
+
     try {
       await AuthService.register(
         name: _nameController.text.trim(),
@@ -54,10 +56,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
       );
 
+      logInfo('✅ Регистрация прошла успешно', tag: 'RegisterScreen');
+
       final response = await AuthService.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
+
+      logDebug('🔐 Авторизация прошла: ${response['id']}', tag: 'RegisterScreen');
 
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -69,7 +75,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logError('❌ Ошибка при регистрации: $e',
+          tag: 'RegisterScreen', error: e, stackTrace: stackTrace);
       if (mounted) setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -219,6 +227,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
 
 
 

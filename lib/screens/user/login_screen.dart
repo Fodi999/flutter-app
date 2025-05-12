@@ -17,6 +17,9 @@ import 'package:sushi_app/screens/user/profile_screen.dart';
 import 'package:sushi_app/theme/app_spacing.dart';
 import 'package:sushi_app/theme/translator.dart';
 
+// логгер
+import 'package:sushi_app/utils/log_helper.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
@@ -53,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
 
+    logInfo('🔐 Попытка входа', tag: 'LoginScreen');
+
     try {
       final email = _email.text.trim();
       final password = _pass.text;
@@ -61,6 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = res['token'] as String;
       final id = res['id'] as String;
       final role = res['role'] as String;
+
+      logDebug('🎫 Токен получен: $token', tag: 'LoginScreen');
+      logInfo('📛 Роль: $role', tag: 'LoginScreen');
 
       if (!mounted) return;
 
@@ -80,6 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
           orders: 0,
           avatarLetter: 'A',
         );
+        logInfo('🔐 Вход как админ', tag: 'LoginScreen');
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -88,6 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         final user = await UserService.getUserById(id, token);
+        logInfo('👤 Вход как пользователь: ${user.name}', tag: 'LoginScreen');
+
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -96,7 +108,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logError('❌ Ошибка входа: $e', tag: 'LoginScreen', error: e, stackTrace: stackTrace);
       if (mounted) setState(() => _error = e.toString());
     }
 
@@ -210,6 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 
 

@@ -1,4 +1,3 @@
-// lib/screens/admin/admin_dashboard.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +9,7 @@ import 'controllers/admin_dashboard_controller.dart';
 import 'manage_users.dart';
 import 'manage_categories.dart';
 import 'manage_inventory.dart';
+import 'manage_ads.dart'; // ✅ реклама
 
 import 'components/dashboard/sidebar_item.dart';
 import 'components/dashboard/dashboard_card.dart';
@@ -63,8 +63,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
   }
 
   Future<void> _loadDashboardData() async {
-    final result =
-        await AdminDashboardController.fetchUserStats(widget.token);
+    final result = await AdminDashboardController.fetchUserStats(widget.token);
     final menuItems = await MenuService.getMenuWithCategory(widget.token);
 
     if (result != null && mounted) {
@@ -75,15 +74,14 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
       }
       setState(() {
         userCount = result['userCount'] as int;
-        staff      = List<User>.from(result['staff'] as List);
+        staff = List<User>.from(result['staff'] as List);
         staffCount = result['staffCount'] as int;
-        menuItemCount  = menuItems.length;
+        menuItemCount = menuItems.length;
         categoryCounts = counts;
       });
     }
   }
 
-  /* ---------------- контент по вкладкам ---------------- */
   Widget _buildContent() {
     switch (currentPage) {
       case 'users':
@@ -94,6 +92,8 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
         return ManageCategoriesScreen(token: widget.token);
       case 'inventory':
         return ManageInventoryScreen(token: widget.token);
+      case 'ads': // ✅ реклама
+        return ManageAdsScreen(token: widget.token);
       default:
         return FadeTransition(
           opacity: _fadeAnimation,
@@ -102,7 +102,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /* верхние карточки */
                 Row(
                   children: [
                     Flexible(
@@ -175,13 +174,12 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
 
   @override
   Widget build(BuildContext context) {
-    final isDark       = Theme.of(context).brightness == Brightness.dark;
-    final themeProv    = ref.watch(themeProvider);       // ← Riverpod
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final themeProv = ref.watch(themeProvider);
 
     return Scaffold(
       body: Row(
         children: [
-          /* ---------------------- sidebar ---------------------- */
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             width: isSidebarOpen ? 240 : 72,
@@ -204,7 +202,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
                       setState(() => isSidebarOpen = !isSidebarOpen),
                 ),
                 const SizedBox(height: 16),
-                /* --- пункты меню --- */
                 SidebarItem(
                   icon: Icons.dashboard,
                   label: 'Панель',
@@ -267,6 +264,18 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
                   },
                 ),
                 SidebarItem(
+                  icon: Icons.campaign_rounded,
+                  label: 'Реклама', // ✅ новая вкладка
+                  selected: currentPage == 'ads',
+                  showLabel: isSidebarOpen,
+                  onTap: () {
+                    setState(() {
+                      currentPage = 'ads';
+                      _controller.forward(from: 0);
+                    });
+                  },
+                ),
+                SidebarItem(
                   icon: Icons.logout,
                   label: 'Выход',
                   showLabel: isSidebarOpen,
@@ -275,8 +284,6 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
               ],
             ),
           ),
-
-          /* ------------------- основная область ------------------ */
           Expanded(
             child: Scaffold(
               appBar: AppBar(
@@ -290,8 +297,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
                           ? Icons.light_mode
                           : Icons.dark_mode,
                     ),
-                    onPressed: () =>
-                        ref.read(themeProvider).toggleTheme(),
+                    onPressed: () => ref.read(themeProvider).toggleTheme(),
                   ),
                 ],
               ),
@@ -304,6 +310,7 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard>
     );
   }
 }
+
 
 
 
